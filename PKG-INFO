@@ -1,0 +1,22 @@
+Metadata-Version: 1.1
+Name: vidcutter
+Version: 2.0.0
+Summary: FFmpeg based video cutter & joiner with a modern PyQt5 GUI
+Home-page: http://vidcutter.ozmartians.com
+Author: Pete Alexandrou
+Author-email: pete@ozmartians.com
+License: GPLv3+
+Description: Cross-platform Qt5 based app for quick and easy video trimming/splitting and merging/joining for simple quick edits.
+        FFmpeg dives the backend with a stylishly hand edited Qt5 UI. FFmpg static binary is pre-installed for Windows builds.
+        For non-windows, use your o/s package manager if on Linux and homebrew for Mac OS X to manage FFmpeg. It is most likely already installed on your Linux or macOS machine.
+        
+Keywords: vidcutter audiovideoediting audiovideo videoeditor video videoedit pyqt Qt5 multimedia
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: X11 Applications :: Qt
+Classifier: Intended Audience :: End Users/Desktop
+Classifier: License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)
+Classifier: Natural Language :: English
+Classifier: Operating System :: OS Independent
+Classifier: Topic :: Communications :: File Sharing
+Classifier: Programming Language :: Python :: 3.5

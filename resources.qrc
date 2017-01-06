@@ -1,0 +1,17 @@
+<RCC>
+  <qresource>
+    <file>fonts/DroidSansMono.ttf</file>
+    <file>fonts/HelveticaNeue.ttf</file>
+    <file>fonts/OpenSans.ttf</file>
+    <file>images/clipindex.png</file>
+    <file>images/filmstrip.png</file>
+    <file>images/handle.png</file>
+    <file>images/knob.png</file>
+    <file>images/muted.png</file>
+    <file>images/novideo.png</file>
+    <file>images/novideotext.gif</file>
+    <file>images/runtime.png</file>
+    <file>images/unmuted.png</file>
+    <file>images/vidcutter.png</file>
+  </qresource>
+</RCC>
