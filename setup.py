@@ -56,7 +56,7 @@ setup(
 
     setup_requires=['setuptools'],
 
-    # install_requires=['PyQt5 >= 5.5', 'qtawesome >= 0.3.3'],
+    install_requires=['qtawesome'],
 
     package_data={'vidcutter': get_package_data()},
 
