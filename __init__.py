@@ -3,4 +3,4 @@
 
 __version__ = '2.2.0'
 
-__packager__ = 'pypi'  # [ pypi | arch | deb ]
+__packager__ = 'deb'  # [ pypi | arch | deb ]
