@@ -140,7 +140,8 @@ class VidCutter(QWidget):
         self.videoplayerWidget = QWidget(self, visible=False)
         self.videoplayerWidget.setLayout(videoplayerLayout)
 
-        self.muteButton = QPushButton(icon=self.unmuteIcon, flat=True, toolTip='Mute',
+        self.muteButton = QPushButton(objectName='muteButton', icon=self.unmuteIcon,
+                                      flat=True, toolTip='Mute',
                                       statusTip='Toggle audio mute', iconSize=QSize(16, 16),
                                       cursor=Qt.PointingHandCursor, clicked=self.muteAudio)
 
@@ -148,9 +149,10 @@ class VidCutter(QWidget):
                                     cursor=Qt.PointingHandCursor, value=50, minimum=0, maximum=100,
                                     sliderMoved=self.setVolume)
 
-        self.menuButton = QPushButton(icon=self.menuIcon, flat=True, toolTip='Menu',
+        self.menuButton = QPushButton(objectName='menuButton', flat=True, toolTip='Menu',
                                       statusTip='Media + application information',
                                       iconSize=QSize(24, 24), cursor=Qt.PointingHandCursor)
+        self.menuButton.setFixedSize(QSize(24, 24))
         self.menuButton.setMenu(self.appMenu)
 
         toolbarLayout = QHBoxLayout()
@@ -170,8 +172,9 @@ class VidCutter(QWidget):
         controlsLayout.addStretch(1)
         controlsLayout.addWidget(self.muteButton)
         controlsLayout.addWidget(self.volumeSlider)
+        controlsLayout.addSpacing(10)
         controlsLayout.addWidget(self.menuButton)
-        controlsLayout.addSpacing(1)
+        controlsLayout.addSpacing(10)
 
         layout = QVBoxLayout()
         layout.setContentsMargins(10, 10, 10, 4)
