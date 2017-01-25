@@ -1,31 +1,32 @@
-QGroupBox#toolbarGroup {
-    background-color: rgba(0, 0, 0, 0.1);
-    border: 1px inset #888;
-    border-radius: 5px;
+QWidget#novideoWidget {
+    border: 1px solid #666;
+    background-color: #888E93;
 }
 
 /* -------------------------------------------------------------------------- */
 
-QToolBar#appcontrols { spacing: 5px; }
+QToolBar#appcontrols { spacing: 6px; }
 
 QToolBar#appcontrols QToolButton {
     border: 1px solid transparent;
     min-width: 100px;
-    font-size: 15pt;
-    font-weight: 300;
     border-radius: 5px;
     padding: 1px 2px;
+    margin: 0;
     color: #6A4572;
+    font-size: 15pt;
+    font-weight: 400;
+    line-height: 80%;
 }
 
 QToolBar#appcontrols QToolButton:hover {
-    border: 1px inset #6A4572;
+    border: 1px solid #888;
     color: #6A4572;
     background-color: rgba(255, 255, 255, 0.85);
 }
 
 QToolBar#appcontrols QToolButton:pressed {
-    border: 1px inset #6A4572;
+    border: 1px solid #444;
     color: #6A4572;
     background-color: rgba(255, 255, 255, 0.25);
 }
@@ -34,24 +35,11 @@ QToolBar#appcontrols QToolButton:disabled { color: #999; }
 
 /* -------------------------------------------------------------------------- */
 
-QPushButton::menu-indicator  {
-    subcontrol-origin: padding;
-    subcontrol-position: right;
-    left: -4px;
-}
-
-/* -------------------------------------------------------------------------- */
-
 QListView {
     border-radius: 0;
     border: none;
     border-left: 1px solid #B9B9B9;
     border-right: 1px solid #B9B9B9;
-    outline: none;
-}
-
-QListView:selected {
-    outline: none;
 }
 
 QListView::item { padding: 10px 0; }
@@ -80,4 +68,22 @@ QLabel#timeCounter {
     font-family: "Droid Sans Mono", monospace;
     font-size: 12.5pt;
     padding: 4px;
+}
+
+/* -------------------------------------------------------------------------- */
+
+QPushButton#menuButton {
+    border-image: url(:/images/menu.png);
+    width: 24px;    
+    height: 24px;
+}
+
+QPushButton:hover#menuButton, QPushButton:pressed#menuButton { border-image: url(:/images/menu-active.png); }
+
+QPushButton::menu-indicator#menuButton { left: -1000px; }
+
+QPushButton#muteButton, QPushButton#menuButton {
+    background-color: transparent;
+    border: none;
+    outline: none;
 }
