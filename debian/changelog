@@ -1,8 +1,30 @@
+vidcutter (2.6.5-1) stable; urgency=medium
+
+  * major fixes to ensure frame accuracy between player and backend. once loaded
+    a video framerate is estimated and seeking/stepping by a single step, using 
+    arrow keys or mouse wheel should be closest to a single frame in either
+    direction. when marking cut points the point in time to the millisecond is also
+    communicated to the backend. this will all improve even further with the next
+    major release which will encompass a move away from Qt's QMediaPlayer
+    widgets which utilise GStreamer (Linux/Mac) and DirectShow (Windows) to a
+    libmpv (MPV player) based client.
+
+  * command line argument support added. run the app from the command line
+     with --help or -h for the details.
+
+  * major code restructure for a more pluggable/adaptable architecture ie.
+    in future, w/ libmpv if for some reason system cannot support it then
+    fallback to existing backend (what we have now w/ GStreamer etc.)
+
+ -- Pete Alexandrou <pete@ozmartians.com>  Thu, 03 Feb 2017 12:15:12 +0800
+
 vidcutter (2.5.0-1) stable; urgency=medium
 
-  * video seeking is now by frame rather than one second intervals
+  * video seeking is now closer to a frame rather and no longer a one second
+     interval
+
   * shortcut keys for seeking video updated for frame stepping changes
-     (i.e. left-right / mous wheel = 1 frame; up-down = 10 frames)
+     (i.e. left-right / mouse wheel = 1 step; up-down = 10 steps)
 
   * early & basic support for EDLs. Only the very simple MPlayer EDL standard 
      is currently supported but this now allows you to save your clip index for 

@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import struct
 import sys
 from codecs import open
 from os import path
@@ -10,7 +9,7 @@ from re import match
 from setuptools import setup
 
 
-def get_value(varname, filename='__init__.py'):
+def get_value(varname, filename='vidcutter/__init__.py'):
     with open(path.join(here, filename), encoding='utf-8') as initfile:
         for line in initfile.readlines():
             m = match('__%s__ *= *[\'](.*)[\']' % varname, line)
@@ -27,11 +26,6 @@ def get_description(filename='README.md'):
     return desc
 
 
-def get_architecture():
-    bits = struct.calcsize('P') * 8
-    return 'win-amd64' if bits == 64 else 'win32'
-
-
 def get_install_requires():
     if packager == 'pypi':
         return ['PyQt5 >= 5.5']
@@ -40,13 +34,20 @@ def get_install_requires():
 
 
 def get_data_files():
+    files = []
     if sys.platform.startswith('linux'):
-        return [
-            ('/usr/share/pixmaps', ['data/icons/vidcutter.png']),
+        files = [
+            ('/usr/share/icons/hicolor/22x22/apps', ['data/icons/hicolor/22x22/apps/vidcutter.png']),
+            ('/usr/share/icons/hicolor/24x24/apps', ['data/icons/hicolor/24x24/apps/vidcutter.png']),
+            ('/usr/share/icons/hicolor/32x32/apps', ['data/icons/hicolor/32x32/apps/vidcutter.png']),
+            ('/usr/share/icons/hicolor/48x48/apps', ['data/icons/hicolor/48x48/apps/vidcutter.png']),
+            ('/usr/share/icons/hicolor/64x64/apps', ['data/icons/hicolor/64x64/apps/vidcutter.png']),
+            ('/usr/share/icons/hicolor/128x128/apps', ['data/icons/hicolor/128x128/apps/vidcutter.png']),
+            ('/usr/share/icons/hicolor/256x256/apps', ['data/icons/hicolor/256x256/apps/vidcutter.png']),
+            ('/usr/share/icons/hicolor/512x512/apps', ['data/icons/hicolor/512x512/apps/vidcutter.png']),
             ('/usr/share/applications', ['data/desktop/vidcutter.desktop'])
         ]
-    else:
-        return []
+    return files.append(('.', ['README.md', 'LICENSE']))
 
 
 here = path.abspath(path.dirname(__file__))
@@ -65,22 +66,20 @@ setup(
 
     packages=['vidcutter'],
 
-    package_dir={'vidcutter': '.'},
+    package_dir={'vidcutter': 'vidcutter'},
 
     setup_requires=['setuptools'],
 
     install_requires=get_install_requires(),
 
     package_data={'vidcutter': [
-        'LICENSE',
-        'README.md',
         'data/desktop/*.*',
         'data/icons/*.*'
     ]},
 
     data_files=get_data_files(),
 
-    entry_points={'gui_scripts': ['vidcutter = vidcutter.vidcutter:main']},
+    entry_points={'gui_scripts': ['vidcutter = vidcutter.__main__:main']},
 
     keywords='vidcutter audiovideoediting audiovideo videoeditor video videoedit pyqt Qt5 multimedia',
 
@@ -90,9 +89,8 @@ setup(
         'Intended Audience :: End Users/Desktop',
         'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
         'Natural Language :: English',
-        'Operating System :: OS Independent',
-        'Topic :: Communications :: File Sharing',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6'
+        'Operating System :: POSIX',
+        'Topic :: Multimedia :: Video :: Non-Linear Editor',
+        'Programming Language :: Python :: 3 :: Only'
     ]
 )

@@ -1,6 +1,6 @@
 <div align="right"><img src="https://travis-ci.org/ozmartian/vidcutter.svg?branch=master" /></div>
 
-![VidCutter](https://raw.githubusercontent.com/ozmartian/vidcutter/master/images/vidcutter.png)
+![VidCutter](https://raw.githubusercontent.com/ozmartian/vidcutter/master/vidcutter/images/vidcutter.png)
 
 <p><b>Homepage:</b> <a href="http://vidcutter.ozmartians.com" target=_blank">http://vidcutter.ozmartians.com</a></p>
 
@@ -14,7 +14,7 @@ Install via PyPi as a last resort only if you are using a Linux distribution tha
 
 ArchLinux users can install directly from AUR, package is available in both stable and git-latest versions:
 
-    AUR: vidcutter, vidgutter-git
+    AUR: vidcutter, vidcutter-git
 
 Ubuntu/Mint/Debian users can install via Launchpad PPA.
 

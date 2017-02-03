@@ -13,7 +13,7 @@ from PyQt5.QtWidgets import qApp, QMessageBox
 
 
 class VideoService(QObject):
-    def __init__(self, parent):
+    def __init__(self, parent=None):
         super(VideoService, self).__init__(parent)
         self.parent = parent
         self.consoleOutput = ''
@@ -21,14 +21,14 @@ class VideoService(QObject):
             self.backend = os.path.join(self.getAppPath(), 'bin', 'ffmpeg.exe')
             if not os.path.exists(self.backend):
                 self.backend = find_executable('ffmpeg.exe')
-        elif sys.platform == 'darwin':
-            self.backend = os.path.join(self.getAppPath(), 'bin', 'ffmpeg')
         else:
-            for exe in ('ffmpeg', 'avconv'):
-                exe_path = find_executable(exe)
-                if exe_path is not None:
-                    self.backend = exe_path
-                    break
+            self.backend = os.path.join(self.getAppPath(), 'bin', 'ffmpeg')
+            if not os.path.exists(self.backend):
+                for exe in ('ffmpeg', 'avconv'):
+                    exe_path = find_executable(exe)
+                    if exe_path is not None:
+                        self.backend = exe_path
+                        break
         self.initProc()
 
     def initProc(self) -> None:
