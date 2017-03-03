@@ -1,3 +1,36 @@
+vidcutter (3.0.0-1) stable; urgency=medium
+
+  * complete rewrite of multimedia backend which now uses libmpv to drive
+     video viewing and enables frame stepping for greater accuracy in cutting.
+     this has greatly shortened to the list of dependcies to enable this app to
+     work and should allow for quicker and easier installation for all users.
+
+  * frame level accuracy when stepping through video via cursor keys or mouse
+     wheel. see the new Keyboard Shortcuts menu option for more details.
+
+  * improved UI in many areas including main toolbar redesign.
+
+  * keyboard shortcuts now advertised to user view new menu option
+
+  * exception handing improved with all errors, even those not surfaced to user,
+     are logged. application log file can be viewed by the user via new menu
+     option.
+
+  * mediainfo library now used to generate metadata for media information which
+    works a million times better than what the previous gstreamer codecs had to
+    offer.
+
+  * hardware accelerated video via vdpau or vaapi depending on what user has
+    installaed. this is all dependant on libpmpv which is the by far the best
+    multimedia library in the opensource world. fallback options also exist if
+    user has no power codecs installed so things should all still work on a
+    minimual workstation setup.
+
+  * many UI fixes and improvements that I cannot be bothered to list but 
+    should overall make the app feel much more professional than ever before :-)
+
+ -- Pete Alexandrou <pete@ozmartians.com>  Fri, 03 Mar 2017 20:15:03 +0800
+
 vidcutter (2.6.5-1) stable; urgency=medium
 
   * major fixes to ensure frame accuracy between player and backend. once loaded
