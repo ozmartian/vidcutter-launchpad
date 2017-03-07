@@ -1,3 +1,16 @@
+vidcutter (3.0.1-1) stable; urgency=medium
+
+  * added support for multiple audio/visual streams. so you your newly built
+  video file will contain same number and configuration of a/v streams as the
+  source file.
+
+  * improved exception handling and reporting back to users + internal backend
+    logging
+
+  * visual tweaks
+
+ -- Pete Alexandrou <pete@ozmartians.com>  Fri, 03 Mar 2017 20:15:03 +0800
+
 vidcutter (3.0.0-1) stable; urgency=medium
 
   * complete rewrite of multimedia backend which now uses libmpv to drive
