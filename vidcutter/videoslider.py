@@ -26,14 +26,47 @@ import logging
 import sys
 
 from PyQt5.QtCore import QEvent, QObject, Qt, pyqtSlot
-from PyQt5.QtGui import (QBrush, QColor, QCursor, QKeyEvent, QMouseEvent, QPaintEvent, QPainterPath, QPen, QPixmap,
+from PyQt5.QtGui import (QColor, QCursor, QKeyEvent, QMouseEvent, QPaintEvent, QPainterPath, QPen, QPixmap,
                          QWheelEvent)
-from PyQt5.QtWidgets import QSlider, QStyle, QStyleOptionSlider, QStylePainter, qApp
+from PyQt5.QtWidgets import qApp, QSlider, QStyle, QStyleOptionSlider, QStylePainter
 
 
 class VideoSlider(QSlider):
     def __init__(self, *arg, **kwargs):
         super(VideoSlider, self).__init__(*arg, **kwargs)
+        self.theme = self.parentWidget().theme
+        self._styles = '''QSlider:horizontal { margin: 25px 0 18px; }
+        QSlider::groove:horizontal {
+            border-top: 1px solid #8F8F8F;
+            border-bottom: 1px solid #444;
+            height: 32px;
+            background: #444 url(:images/filmstrip.png) repeat-x;
+            position: absolute;
+            left: 4px;
+            right: 4px;
+            margin: 0;
+        }
+        QSlider::sub-page:horizontal {
+            border: none;
+            background: %s;
+            height: 20px;
+            position: absolute;
+            left: 0;
+            right: 0;
+            margin: 0;
+            margin-left: %s;
+        }
+        QSlider::add-page:horizontal{
+            border: none;
+            background: transparent;
+        }
+        QSlider::handle:horizontal {
+            border: none;
+            background: url(:images/handle.png) no-repeat top center;
+            width: 20px;
+            height: 58px;
+            margin: -19px -6px;
+        }'''
         self._regions = list()
         self._regionHeight = 12
         self._regionSelected = -1
@@ -57,10 +90,8 @@ class VideoSlider(QSlider):
         self.installEventFilter(self)
 
     def initStyle(self, selected: bool = False, margin: str = '0') -> None:
-        bground = 'transparent'
-        if selected:
-            bground = 'rgba(200, 213, 236, 0.85)'
-        self.setStyleSheet(self.getStyleSheet(bground, margin))
+        bground = 'rgba(200, 213, 236, 0.85)' if selected else 'transparent'
+        self.setStyleSheet(self._styles % (bground, margin))
 
     def setRestrictValue(self, value: int, force: bool = False) -> None:
         self.restrictValue = value
@@ -85,14 +116,15 @@ class VideoSlider(QSlider):
             x = 4
             for i in range(self.minimum(), self.width(), x):
                 if i % 5 == 0:
-                    h = 18
+                    h = 10
                     w = 1
-                    z = 8
+                    z = 12
                 else:
-                    h = 7
-                    w = 0.8
-                    z = 15
-                pen = QPen(QColor('#444'))
+                    h = 5
+                    w = 1
+                    z = 16
+                tickcolor = '#8F8F8F' if self.theme == 'dark' else '#444'
+                pen = QPen(QColor(tickcolor))
                 pen.setWidthF(w)
                 painter.setPen(pen)
                 if self.tickPosition() in (QSlider.TicksBothSides, QSlider.TicksAbove):
@@ -101,7 +133,7 @@ class VideoSlider(QSlider):
                 if self.tickPosition() in (QSlider.TicksBothSides, QSlider.TicksBelow):
                     y = self.rect().bottom() - z
                     painter.drawLine(x, y, x, y - h)
-                x += 10
+                x += 15
         opt.subControls = QStyle.SC_SliderGroove
         painter.drawComplexControl(QStyle.CC_Slider, opt)
         for path in self._regions:
@@ -128,7 +160,7 @@ class VideoSlider(QSlider):
         self._regions.insert(index2, reg)
         self.update()
 
-    def highlightRegion(self, clipindex: int):
+    def selectRegion(self, clipindex: int):
         self._regionSelected = clipindex
         self.update()
 
@@ -138,7 +170,12 @@ class VideoSlider(QSlider):
         self.update()
 
     def wheelEvent(self, event: QWheelEvent) -> None:
-        qApp.sendEvent(self.parentWidget(), event)
+        if self.parentWidget().mediaAvailable:
+            if event.angleDelta().y() > 0:
+                self.parentWidget().mediaPlayer.frame_back_step()
+            else:
+                self.parentWidget().mediaPlayer.frame_step()
+            event.accept()
 
     def keyPressEvent(self, event: QKeyEvent) -> None:
         qApp.sendEvent(self.parentWidget(), event)
@@ -148,7 +185,7 @@ class VideoSlider(QSlider):
         self.initStyleOption(opt)
         handle = self.style().subControlRect(QStyle.CC_Slider, opt, QStyle.SC_SliderHandle, self)
         if handle.x() <= event.pos().x() <= (handle.x() + handle.width()):
-            self.setCursor(self.slider_cursor)
+            self.setCursor(Qt.PointingHandCursor)
         else:
             self.unsetCursor()
         super(VideoSlider, self).mouseMoveEvent(event)
@@ -159,36 +196,3 @@ class VideoSlider(QSlider):
                 self.setValue(QStyle.sliderValueFromPosition(self.minimum(), self.maximum(), event.x(), self.width()))
                 self.parentWidget().setPosition(self.sliderPosition())
         return super(VideoSlider, self).eventFilter(obj, event)
-
-    def getStyleSheet(self, bground: str, margin: str) -> str:
-        return '''QSlider:horizontal { margin: 25px 0 18px; }
-QSlider::groove:horizontal {
-    border: none;
-    height: 32px;
-    background: #333 url(:images/filmstrip.png) repeat-x;
-    position: absolute;
-    left: 4px;
-    right: 4px;
-    margin: 0;
-}
-QSlider::sub-page:horizontal {
-    border: none;
-    background: %s;
-    height: 20px;
-    position: absolute;
-    left: 0;
-    right: 0;
-    margin: 0;
-    margin-left: %s;
-}
-QSlider::add-page:horizontal{
-    border: none;
-    background: transparent;
-}
-QSlider::handle:horizontal {
-    border: none;
-    background: url(:images/handle.png) no-repeat top center;
-    width: 20px;
-    height: 58px;
-    margin: -15px -8px;
-}''' % (bground, margin)

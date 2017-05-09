@@ -1,8 +1,7 @@
-![Build Status](https://travis-ci.org/ozmartian/vidcutter.svg?branch=master)
+![VidCutter](https://raw.githubusercontent.com/ozmartian/vidcutter/gh-pages/vidcutter-banner.png)
 
-# VidCutter
-
-<img src="https://raw.githubusercontent.com/ozmartian/vidcutter/master/data/icons/vidcutter.png" width="120" height="120" />
+![Build Status](https://travis-ci.org/ozmartian/vidcutter.svg?branch=master) 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/425a00c7c6af446ba87c6152567d9f7e)](https://www.codacy.com/app/ozmartian/vidcutter?utm_source=github.com&utm_medium=referral&utm_content=ozmartian/vidcutter&utm_campaign=badger)
 
 ### Windows + macOS Users
 
@@ -14,13 +13,13 @@ Native installers for Windows and macOS are available on the releases page with 
 
 ### Linux Users
 
-####Arch Linux
+#### Arch Linux
 
 Users can install directly from AUR, package is available in both stable and git-latest versions:
 
     AUR: vidcutter, vidcutter-git
 
-####Ubuntu/Mint/Debian and all other Ubuntu derivatives 
+#### Ubuntu/Mint/Debian and all other Ubuntu derivatives 
 
 Users can install the latest release via:
 
@@ -32,7 +31,7 @@ If you are new to PPAs then just issue the following commands in a terminal:
     sudo apt-get update
     sudo apt-get install vidcutter
 
-####Fedora
+#### Fedora
 
 Users can install via the RPM available on the releases page or via my custom copr repository:
 
@@ -43,19 +42,19 @@ The commands for a Fedora install via this method are:
     dnf copr enable suspiria/VidCutter
     dnf install vidcutter
 
-####openSUSE
+#### openSUSE
 
 VidCutter is available via the Packman third-party repository. Instructions to enable it can be found here:
 
    https://en.opensuse.org/Additional_package_repositories#Packman
 
-####AppImage
+### AppImage
 
 An AppImage version is also available on the releases page to help all other Linux users.
 
 ***
 
-###PyPi
+### PyPi
 
 If you're familiar with Python and PyPi then you can always try that option too but avoid installing PyQt5 from through pip and instead run with your distributions own PyQt5 offering. PyQt5 is known as some of the following names under various distros: python-pyqt5, python3-pyqt5, python3-qt5 etc. Using your distro's version ensures a more seamless look & feel with the app integrating with your distro's look & feel + widget sets. Installing all via PyPi will still work, but won't look as nice..
 

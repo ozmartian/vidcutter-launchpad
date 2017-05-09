@@ -22,26 +22,63 @@
 #
 #######################################################################
 
-from PyQt5.QtCore import QObject, QEvent
-from PyQt5.QtWidgets import QToolBar, QToolButton
+import sys
+
+from PyQt5.QtCore import pyqtSlot, QObject, QEvent, Qt
+from PyQt5.QtWidgets import QAction, qApp, QStyleFactory, QToolBar, QToolButton
 
 
 class VideoToolBar(QToolBar):
-    def __init__(self, *arg, **kwargs):
-        super(VideoToolBar, self).__init__(*arg, **kwargs)
+    def __init__(self, parent=None, *arg, **kwargs):
+        super(VideoToolBar, self).__init__(parent, *arg, **kwargs)
+        self.parent = parent
+        self.setObjectName('appcontrols')
+        self.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
+        if sys.platform == 'darwin':
+            self.setStyle(QStyleFactory.create('Fusion'))
 
-    def disableTooltips(self):
-        c = 1
-        total = len(self.findChildren(QToolButton))
-        for button in self.findChildren(QToolButton):
+    def disableTooltips(self) -> None:
+        buttonlist = self.findChildren(QToolButton)
+        for button in buttonlist:
             button.installEventFilter(self)
-            if c == total:
+            if button == buttonlist[len(buttonlist)-1]:
                 button.setObjectName('saveButton')
-            c += 1
+
+    @pyqtSlot(QAction)
+    def setLabels(self, action: QAction) -> None:
+        if action == self.parent.besideLabelsAction:
+            self.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
+            for button in self.findChildren(QToolButton):
+                button.setText(button.text().replace(' ', '\n'))
+        elif action == self.parent.underLabelsAction:
+            self.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
+            for button in self.findChildren(QToolButton):
+                button.setText(button.text().replace('\n', ' '))
+        elif action == self.parent.noLabelsAction:
+            self.setToolButtonStyle(Qt.ToolButtonIconOnly)
+
+    def setLabelByType(self, label_type: str) -> None:
+        if label_type == 'beside':
+            self.parent.besideLabelsAction.setChecked(True)
+            self.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
+            for button in self.findChildren(QToolButton):
+                button.setText(button.text().replace(' ', '\n'))
+        elif label_type == 'under':
+            self.parent.underLabelsAction.setChecked(True)
+            self.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
+            for button in self.findChildren(QToolButton):
+                button.setText(button.text().replace('\n', ' '))
+        elif label_type == 'none':
+            self.parent.noLabelsAction.setChecked(True)
+            self.setToolButtonStyle(Qt.ToolButtonIconOnly)
 
     def eventFilter(self, obj: QObject, event: QEvent) -> bool:
         if event.type() == QEvent.ToolTip:
             return True
+        elif event.type() == QEvent.Enter and obj.isEnabled():
+            qApp.setOverrideCursor(Qt.PointingHandCursor)
+        elif event.type() == QEvent.Leave:
+            qApp.restoreOverrideCursor()
         elif event.type() == QEvent.StatusTip and not obj.isEnabled():
             return True
         return super(VideoToolBar, self).eventFilter(obj, event)

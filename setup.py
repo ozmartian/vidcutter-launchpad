@@ -22,8 +22,8 @@
 #
 #######################################################################
 
+import codecs
 import sys
-from codecs import open
 from os import path
 from re import match
 
@@ -31,7 +31,7 @@ from setuptools import setup
 
 
 def get_value(varname, filename='vidcutter/__init__.py'):
-    with open(path.join(here, filename), encoding='utf-8') as initfile:
+    with codecs.open(path.join(here, filename), encoding='utf-8') as initfile:
         for line in initfile.readlines():
             m = match('__%s__ *= *[\'](.*)[\']' % varname, line)
             if m:
@@ -39,7 +39,7 @@ def get_value(varname, filename='vidcutter/__init__.py'):
 
 
 def get_description(filename='README.md'):
-    with open(path.join(here, filename), encoding='utf-8') as f:
+    with codecs.open(path.join(here, filename), encoding='utf-8') as f:
         file = list(f)
     desc = ''
     for item in file[11: len(file)]:
@@ -58,6 +58,7 @@ def get_data_files():
     files = []
     if sys.platform.startswith('linux'):
         files = [
+            ('/usr/share/icons/hicolor/16x16/apps', ['data/icons/hicolor/16x16/apps/vidcutter.png']),            
             ('/usr/share/icons/hicolor/22x22/apps', ['data/icons/hicolor/22x22/apps/vidcutter.png']),
             ('/usr/share/icons/hicolor/24x24/apps', ['data/icons/hicolor/24x24/apps/vidcutter.png']),
             ('/usr/share/icons/hicolor/32x32/apps', ['data/icons/hicolor/32x32/apps/vidcutter.png']),
@@ -81,12 +82,12 @@ setup(
     version=get_value('version'),
     author='Pete Alexandrou',
     author_email='pete@ozmartians.com',
-    description='the simple & fast video cutter & joiner with the help of mpv + FFmpeg',
+    description='the simplest + fastest video cut & merge tool',
     long_description=get_description(),
     url='http://vidcutter.ozmartians.com',
     license='GPLv3+',
 
-    packages=['vidcutter'],
+    packages=['vidcutter', 'vidcutter.libs'],
 
     setup_requires=['setuptools'],
 
