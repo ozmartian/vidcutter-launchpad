@@ -3,7 +3,7 @@
 
 #######################################################################
 #
-# VidCutter - a simple yet fast & accurate video cutter & joiner
+# VidCutter - media cutter & joiner
 #
 # copyright © 2017 Pete Alexandrou
 #
@@ -22,6 +22,7 @@
 #
 #######################################################################
 
+import sys
 import logging
 
 from PyQt5.QtCore import QSize, Qt
@@ -41,14 +42,13 @@ class VideoInfo(QDialog):
         self.logger = logging.getLogger(__name__)
         self.parent = parent
         self.setObjectName('videoinfo')
-        if hasattr(self.parent, 'videoService'):
-            self.service = self.parent.videoService
-        else:
+        if not hasattr(self.parent, 'videoService'):
+            self.logger.error('VideoService class unavailable in parent')
+            sys.stderr.write('VideoService class unavailable in parent')
             raise AttributeError('VideoService class unavailable in parent')
 
         self.setContentsMargins(0, 0, 0, 0)
-        self.setWindowModality(Qt.NonModal)
-        self.setWindowIcon(self.parent.parent.windowIcon())
+        self.setWindowModality(Qt.WindowModal)
         self.setWindowTitle('Media information')
         self.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
         self.setMinimumSize(self.modes.get(self.parent.parent.scale))
@@ -62,7 +62,7 @@ class VideoInfo(QDialog):
     td i {
         font-family: "Futura LT", sans-serif;
         font-weight: 500;
-        font-style: normal;
+        font-style: normal;f
         text-align: right;
         color: %s;
         white-space: nowrap;
@@ -72,7 +72,7 @@ class VideoInfo(QDialog):
 </style>
 <div align="center" style="margin:15px;">%s</div>''' % ('#C681D5' if self.parent.theme == 'dark' else '#642C68',
                                                         '#C681D5' if self.parent.theme == 'dark' else '#642C68',
-                                                        self.service.metadata(media))
+                                                        self.parent.videoService.metadata(media))
 
         content = QTextBrowser(self.parent)
         content.setHtml(metadata)
@@ -84,12 +84,12 @@ class VideoInfo(QDialog):
         layout.addWidget(QLabel(pixmap=QPixmap(':/images/%s/mediainfo-heading.png' % self.parent.theme)))
         layout.addWidget(content)
 
-        mediainfo_version = self.service.cmdExec(self.service.mediainfo, '--version', True)
+        mediainfo_version = self.parent.videoService.cmdExec(self.parent.videoService.mediainfo, '--version', True)
         if len(mediainfo_version) >= 2:
             mediainfo_version = mediainfo_version.split('\n')[1]
             mediainfo_label = QLabel('<div style="font-size:11px;"><b>Media information by:</b><br/>%s @ '
                                      % mediainfo_version + '<a href="https://mediaarea.net" target="_blank">' +
-                                     'https://mediaarea.net</a></div>')
+                                     'mediaarea.net</a></div>')
             button_layout = QHBoxLayout()
             button_layout.addWidget(mediainfo_label)
             button_layout.addWidget(buttons)

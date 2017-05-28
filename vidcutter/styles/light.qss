@@ -1,5 +1,5 @@
 /*************************************************************************
- *  VidCutter - a simple yet fast & accurate video cutter & joiner
+ *  VidCutter - media cutter & joiner
  *
  *  copyright © 2017 Pete Alexandrou
  *
@@ -26,6 +26,11 @@ QMainWindow {
 QWidget#shortcuts {
     border-image: url(':/images/watermark.png') 0 0 0 0 stretch stretch;
     background-color: #EFF0F1;
+}
+
+QWidget#videoplayer {
+    border: none;
+    background: #000;
 }
 
 QWidget#novideoWidget {
@@ -157,6 +162,8 @@ QGroupBox#counterwidgets {
     border: none;
     background-color: #000;
     color: #FFF;
+    margin: 0;
+    padding: 0;
 }
 
 /* -------------------------------------------------------------------------- */

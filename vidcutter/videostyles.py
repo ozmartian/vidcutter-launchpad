@@ -3,7 +3,7 @@
 
 #######################################################################
 #
-# VidCutter - a simple yet fast & accurate video cutter & joiner
+# VidCutter - media cutter & joiner
 #
 # copyright © 2017 Pete Alexandrou
 #
@@ -34,7 +34,7 @@ class VideoStyles(QObject):
     _dark, _light = None, None
 
     @staticmethod
-    def loadQSS(theme, devmode: bool = False):
+    def loadQSS(theme, devmode: bool = False) -> str:
         if devmode:
             filename = os.path.join(QFileInfo(__file__).absolutePath(), 'vidcutter/styles/%s.qss' % theme)
         else:
@@ -44,9 +44,7 @@ class VideoStyles(QObject):
             qssfile.open(QFile.ReadOnly | QFile.Text)
             content = QTextStream(qssfile).readAll()
             if sys.platform in ('win32', 'darwin'):
-                content += '''
-                    QPushButton { color: #444; }
-                '''
+                content += 'QPushButton { color: #444; }'
             if sys.platform == 'darwin' and theme == 'dark':
                 content += '''
                     QMenu::item { color: #444; }
@@ -58,7 +56,7 @@ class VideoStyles(QObject):
             return content
 
     @staticmethod
-    def dark():
+    def dark() -> None:
         if VideoStyles._dark is None:
             # if sys.platform == 'win32':
             #     qApp.setStyle(QStyleFactory.create('Fusion'))
@@ -82,7 +80,7 @@ class VideoStyles(QObject):
         qApp.setPalette(VideoStyles._dark)
 
     @staticmethod
-    def light():
+    def light() -> None:
         if VideoStyles._light is None:
             # if sys.platform == 'win32':
             #     qApp.setStyle(QStyleFactory.create('Fusion'))

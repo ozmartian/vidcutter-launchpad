@@ -3,7 +3,7 @@
 
 #######################################################################
 #
-# VidCutter - a simple yet fast & accurate video cutter & joiner
+# VidCutter - media cutter & joiner
 #
 # copyright © 2017 Pete Alexandrou
 #
@@ -113,7 +113,7 @@ class About(QDialog):
         }
         return modes[mode]
 
-    def closeEvent(self, event: QCloseEvent):
+    def closeEvent(self, event: QCloseEvent) -> None:
         self.tab_about.deleteLater()
         self.tab_credits.deleteLater()
         self.tab_license.deleteLater()
@@ -161,8 +161,7 @@ class AboutTab(BaseTab):
                 Website: <a href="http://vidcutter.ozmartians.com">http://vidcutter.ozmartians.com</a>
             </p>
             <p style="font-size:13px;">
-                Icon design by <a href="https://github.com/PapirusDevelopmentTeam">Papirus
-                Development Team</a>
+                Found a bug? Then why not <a href="https://github.com/ozmartian/vidcutter/issues">REPORT IT HERE</a>
             </p>
             <p style="font-size:11px; margin-top:15px;">
                 This program is free software; you can redistribute it and/or

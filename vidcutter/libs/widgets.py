@@ -3,7 +3,7 @@
 
 #######################################################################
 #
-# VidCutter - a simple yet fast & accurate video cutter & joiner
+# VidCutter - media cutter & joiner
 #
 # copyright © 2017 Pete Alexandrou
 #
@@ -22,8 +22,6 @@
 #
 #######################################################################
 
-import sys
-
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt, QTime
 from PyQt5.QtWidgets import (QAbstractSpinBox, QDialog, QGridLayout, QHBoxLayout, QLabel, QProgressBar, QSpinBox,
                              QStyle, QStyleFactory, QTimeEdit, QWidget)
@@ -36,18 +34,7 @@ class TimeCounter(QWidget):
         super(TimeCounter, self).__init__(parent)
         self.parent = parent
         self.timeedit = QTimeEdit(QTime(0, 0), self, objectName='timeCounter')
-        if sys.platform == 'win32':
-            self.timeedit.setStyleSheet('''
-                QTimeEdit::up-arrow, QTimeEdit::down-arrow { padding: 0; margin: 0; }
-                QTimeEdit::up-arrow#timeCounter { image: url(':/images/spinbox-up.png'); }
-                QTimeEdit::down-arrow#timeCounter { image: url(':/images/spinbox-down.png'); }
-                QTimeEdit::up-arrow:disabled#timeCounter,
-                QTimeEdit::up-arrow:off#timeCounter { image: url(':/images/spinbox-up-disabled.png'); }
-                QTimeEdit::down-arrow:disabled#timeCounter,
-                QTimeEdit::down-arrow:off#timeCounter { image: url(':/images/spinbox-down-disabled.png'); }
-            ''')
-        else:
-            self.timeedit.setStyle(QStyleFactory.create('Fusion'))
+        self.timeedit.setStyle(QStyleFactory.create('fusion'))
         self.timeedit.setFrame(False)
         self.timeedit.setDisplayFormat('hh:mm:ss.zzz')
         self.timeedit.timeChanged.connect(self.timeChangeHandler)

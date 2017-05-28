@@ -3,7 +3,7 @@
 
 #######################################################################
 #
-# VidCutter - a simple yet fast & accurate video cutter & joiner
+# VidCutter - media cutter & joiner
 #
 # copyright © 2017 Pete Alexandrou
 #
@@ -22,6 +22,9 @@
 #
 #######################################################################
 
-__version__ = '3.2.0'
+__version__ = '3.5.0'
+
+__author__ = 'Pete Alexandrou'
+__email__ = 'pete@ozmartians.com'
 
 __packager__ = 'deb'  # [ pypi | arch | deb ]

@@ -3,7 +3,7 @@
 
 #######################################################################
 #
-# VidCutter - a simple yet fast & accurate video cutter & joiner
+# VidCutter - media cutter & joiner
 #
 # copyright © 2017 Pete Alexandrou
 #
@@ -60,12 +60,15 @@ class MainWindow(QMainWindow):
         self.show()
         try:
             if len(self.video):
-                self.cutter.loadMedia(self.video)
+                if QFileInfo(self.video).suffix() == 'vcp':
+                    self.cutter.openProject(project_file=self.video)
+                else:
+                    self.cutter.loadMedia(self.video)
         except (FileNotFoundError, PermissionError) as e:
             QMessageBox.critical(self, 'Error loading file', sys.exc_info()[0])
             logging.exception('Error loading file')
             qApp.restoreOverrideCursor()
-            self.cutter.startNew()
+            self.restart()
         if not self.cutter.ffmpeg_check():
             qApp.exit(1)
 
@@ -73,7 +76,6 @@ class MainWindow(QMainWindow):
         screen_size = qApp.desktop().availableGeometry(-1)
         self.scale = 'LOW' if screen_size.width() <= 1024 else 'NORMAL'
         self.setMinimumSize(self.get_size(self.scale))
-        self.setMaximumSize(screen_size.size())
         if os.getenv('DEBUG', False):
             print('minimum size set to: %s (%s)' % (self.get_size(self.scale), self.scale))
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -119,14 +121,12 @@ class MainWindow(QMainWindow):
                 settings_path = QStandardPaths.writableLocation(QStandardPaths.AppConfigLocation).lower()
             except AttributeError:
                 if sys.platform == 'win32':
-                    settings_path = os.path.join(QDir.homePath(), 'AppData', 'Local',
-                                                 qApp.applicationName().lower())
+                    settings_path = os.path.join(QDir.homePath(), 'AppData', 'Local', qApp.applicationName().lower())
                 elif sys.platform == 'darwin':
                     settings_path = os.path.join(QDir.homePath(), 'Library', 'Preferences',
                                                  qApp.applicationName()).lower()
                 else:
-                    settings_path = os.path.join(QDir.homePath(), '.config',
-                                                 qApp.applicationName()).lower()
+                    settings_path = os.path.join(QDir.homePath(), '.config', qApp.applicationName()).lower()
             os.makedirs(settings_path, exist_ok=True)
             settings_file = '%s.ini' % qApp.applicationName().lower()
             self.settings = QSettings(os.path.join(settings_path, settings_file), QSettings.IniFormat)
@@ -134,11 +134,11 @@ class MainWindow(QMainWindow):
             self.restoreGeometry(self.settings.value('geometry'))
         if self.settings.value('windowState') is not None:
             self.restoreState(self.settings.value('windowState'))
-        self.theme = self.settings.value('theme', 'light', str)
-        self.ontop = self.settings.value('alwaysOnTop', False, bool)
+        self.theme = self.settings.value('theme', 'light', type=str)
+        self.startupvol = self.settings.value('volume', 100, type=int)
+        self.ontop = self.settings.value('alwaysOnTop', False, type=bool)
         if self.ontop:
-            self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint)
-        self.startupvol = self.settings.value('volume', 100, int)
+            self.set_always_on_top(self.ontop)
 
     @staticmethod
     def log_uncaught_exceptions(cls, exc, tb) -> None:
@@ -147,8 +147,9 @@ class MainWindow(QMainWindow):
 
     def parse_cmdline(self) -> None:
         self.parser = QCommandLineParser()
-        self.parser.setApplicationDescription('...the fast & accurate cross-platform video cutter & joiner...')
-        self.parser.addPositionalArgument('video', 'Preloads the video file in app.', '[video]')
+        self.parser.setApplicationDescription('\nVidCutter - the simplest + fastest video cutter & joiner')
+        self.parser.addPositionalArgument('video', 'Preload video file', '[video]')
+        self.parser.addPositionalArgument('project', 'Open VidCutter project file (.vcp)', '[project]')
         self.debug_option = QCommandLineOption(['debug'], 'debug mode; verbose console output & logging. ' +
                                                'This will basically output what is being logged to file to the ' +
                                                'console stdout. Mainly useful for debugging problems with your ' +
@@ -169,15 +170,17 @@ class MainWindow(QMainWindow):
             os.environ['DEBUG'] = '1'
         if self.parser.isSet(self.dev_option):
             self.devmode = True
-        if len(self.args) > 0 and not os.path.exists(self.args[0]):
-            print('\n    ERROR: Video file not found.\n', file=sys.stderr)
-            self.close()
-            sys.exit(1)
         if len(self.args) > 0:
-            self.video = self.args[0]
+            file_path = QFileInfo(self.args[0]).absoluteFilePath()
+            if not os.path.exists(file_path):
+                sys.stderr.write('\nERROR: File not found: %s\n\n' % file_path)
+                self.close()
+                sys.exit(1)
+            self.video = file_path
 
     def init_cutter(self) -> None:
         self.cutter = VideoCutter(self)
+        self.cutter.errorOccurred.connect(self.errorHandler)
         qApp.setWindowIcon(QIcon(':/images/vidcutter.png'))
         self.setCentralWidget(self.cutter)
 
@@ -186,9 +189,9 @@ class MainWindow(QMainWindow):
         from struct import calcsize
         return calcsize('P') * 8
 
-    def restart(self) -> None:
-        self.cutter.deleteLater()
-        self.init_cutter()
+    # def restart(self) -> None:
+    #     self.cutter.deleteLater()
+    #     self.init_cutter()
 
     @pyqtSlot()
     def reboot(self) -> None:
@@ -204,13 +207,17 @@ class MainWindow(QMainWindow):
             labels = 'none'
         else:
             labels = 'beside'
-        self.settings.setValue('toolbarLabels', labels)
+        self.settings.setValue('nativeDialogs', self.cutter.nativeDialogsAction.isChecked())
+        self.settings.setValue('alwaysOnTop', self.cutter.alwaysOnTopAction.isChecked())
+        self.settings.setValue('keepClips', self.cutter.keepClipsAction.isChecked())
         self.settings.setValue('aspectRatio', 'keep' if self.cutter.keepRatioAction.isChecked() else 'stretch')
-        self.settings.setValue('nativeDialogs', 'true' if self.cutter.nativeDialogsAction.isChecked() else 'false')
-        self.settings.setValue('alwaysOnTop', 'true' if self.cutter.alwaysOnTopAction.isChecked() else 'false')
-        self.settings.setValue('volume', self.cutter.volumeSlider.value())
-        self.settings.setValue('keepClips', 'true' if self.cutter.keepClipsAction.isChecked() else 'false')
         self.settings.setValue('hwdec', 'auto' if self.cutter.hardwareDecodingAction.isChecked() else 'no')
+        self.settings.setValue('volume', self.cutter.volumeSlider.value())
+        self.settings.setValue('level1Seek', self.cutter.level1_spinner.value())
+        self.settings.setValue('level2Seek', self.cutter.level2_spinner.value())
+        self.settings.setValue('toolbarLabels', labels)
+        self.settings.setValue('timelineThumbs', self.cutter.thumbnailsButton.isChecked())
+        self.settings.setValue('enableOSD', self.cutter.osdButton.isChecked())
         self.settings.setValue('geometry', self.saveGeometry())
         self.settings.setValue('windowState', self.saveState())
         self.settings.sync()
@@ -219,11 +226,11 @@ class MainWindow(QMainWindow):
     def set_always_on_top(self, flag: bool) -> None:
         if flag:
             self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint)
-            if self.cutter.mediaAvailable:
+            if hasattr(self.cutter, 'mediaPlayer'):
                 self.cutter.mediaPlayer.ontop = True
         else:
             self.setWindowFlags(self.windowFlags() & ~Qt.WindowStaysOnTopHint)
-            if self.cutter.mediaAvailable:
+            if hasattr(self.cutter, 'mediaPlayer'):
                 self.cutter.mediaPlayer.ontop = False
         self.show()
 
@@ -243,13 +250,19 @@ class MainWindow(QMainWindow):
                 if m:
                     return m.group(1)
 
+    @pyqtSlot(str)
+    def errorHandler(self, msg: str) -> None:
+        QMessageBox.critical(self, 'An error occurred', '%s<br/>Please try again or use a valid media file.' % msg,
+                             QMessageBox.Ok)
+        self.cutter.initMediaControls(False)
+
     def contextMenuEvent(self, event: QContextMenuEvent) -> None:
         if event.reason() == QContextMenuEvent.Mouse:
             self.cutter.appMenu.exec_(event.globalPos())
             event.accept()
         super(MainWindow, self).contextMenuEvent(event)
 
-    def mousePressEvent(self, event: QMouseEvent):
+    def mousePressEvent(self, event: QMouseEvent) -> None:
         if event.button() == Qt.LeftButton and self.cutter.mediaAvailable:
             self.cutter.cliplist.clearSelection()
             self.cutter.timeCounter.clearFocus()
@@ -265,8 +278,9 @@ class MainWindow(QMainWindow):
         event.accept()
 
     def closeEvent(self, event: QCloseEvent) -> None:
-        self.save_settings()
+        event.accept()
         if hasattr(self, 'cutter'):
+            self.save_settings()
             if hasattr(self.cutter, 'mediaPlayer'):
                 self.cutter.mediaPlayer.terminate()
         qApp.quit()

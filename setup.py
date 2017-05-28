@@ -3,7 +3,7 @@
 
 #######################################################################
 #
-# VidCutter - a simple yet fast & accurate video cutter & joiner
+# VidCutter - media cutter & joiner
 #
 # copyright © 2017 Pete Alexandrou
 #
@@ -58,7 +58,7 @@ def get_data_files():
     files = []
     if sys.platform.startswith('linux'):
         files = [
-            ('/usr/share/icons/hicolor/16x16/apps', ['data/icons/hicolor/16x16/apps/vidcutter.png']),            
+            ('/usr/share/icons/hicolor/16x16/apps', ['data/icons/hicolor/16x16/apps/vidcutter.png']),
             ('/usr/share/icons/hicolor/22x22/apps', ['data/icons/hicolor/22x22/apps/vidcutter.png']),
             ('/usr/share/icons/hicolor/24x24/apps', ['data/icons/hicolor/24x24/apps/vidcutter.png']),
             ('/usr/share/icons/hicolor/32x32/apps', ['data/icons/hicolor/32x32/apps/vidcutter.png']),
@@ -69,7 +69,8 @@ def get_data_files():
             ('/usr/share/icons/hicolor/512x512/apps', ['data/icons/hicolor/512x512/apps/vidcutter.png']),
             ('/usr/share/icons/hicolor/scalable/apps', ['data/icons/vidcutter.svg']),
             ('/usr/share/pixmaps', ['data/icons/vidcutter.svg']),
-            ('/usr/share/applications', ['data/desktop/vidcutter.desktop'])
+            ('/usr/share/applications', ['data/desktop/vidcutter.desktop']),
+            ('/usr/share/mime/packages', ['data/mime/x-vidcutter.xml'])
         ]
     return files
 
@@ -82,7 +83,7 @@ setup(
     version=get_value('version'),
     author='Pete Alexandrou',
     author_email='pete@ozmartians.com',
-    description='the simplest + fastest video cut & merge tool',
+    description='the simplest + fastest video cutter & joiner',
     long_description=get_description(),
     url='http://vidcutter.ozmartians.com',
     license='GPLv3+',

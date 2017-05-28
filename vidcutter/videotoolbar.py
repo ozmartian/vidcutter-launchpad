@@ -3,7 +3,7 @@
 
 #######################################################################
 #
-# VidCutter - a simple yet fast & accurate video cutter & joiner
+# VidCutter - media cutter & joiner
 #
 # copyright © 2017 Pete Alexandrou
 #
@@ -24,7 +24,7 @@
 
 import sys
 
-from PyQt5.QtCore import pyqtSlot, QObject, QEvent, Qt
+from PyQt5.QtCore import pyqtSlot, QEvent, QObject, Qt
 from PyQt5.QtWidgets import QAction, qApp, QStyleFactory, QToolBar, QToolButton
 
 
