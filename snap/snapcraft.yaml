@@ -13,7 +13,7 @@ confinement: devmode
 
 apps:
   vidcutter:
-    command: desktop-launch $SNAP/vidcutter
+    command: desktop-launch vidcutter
     plugs: [home, pulseaudio, x11, opengl]
 
 parts:
