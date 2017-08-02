@@ -22,9 +22,17 @@
 #
 #######################################################################
 
-from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt, QTime
-from PyQt5.QtWidgets import (QAbstractSpinBox, QDialog, QGridLayout, QHBoxLayout, QLabel, QProgressBar, QSpinBox,
-                             QStyle, QStyleFactory, QTimeEdit, QWidget)
+import os
+import sys
+
+from PyQt5.QtCore import pyqtSignal, pyqtSlot, QEvent, QObject, QPoint, Qt, QTime
+from PyQt5.QtGui import QShowEvent
+from PyQt5.QtWidgets import (qApp, QAbstractSpinBox, QDialog, QDialogButtonBox, QGridLayout, QHBoxLayout, QLabel,
+                             QMessageBox, QProgressBar, QSlider, QSpinBox, QStyle, QStyleFactory, QStyleOptionSlider,
+                             QTimeEdit, QToolBox, QToolTip, QVBoxLayout, QWidget)
+
+if sys.platform.startswith('linux'):
+    from vidcutter.libs.taskbarprogress import TaskbarProgress
 
 
 class TimeCounter(QWidget):
@@ -33,13 +41,16 @@ class TimeCounter(QWidget):
     def __init__(self, parent=None):
         super(TimeCounter, self).__init__(parent)
         self.parent = parent
-        self.timeedit = QTimeEdit(QTime(0, 0), self, objectName='timeCounter')
+        self.timeedit = QTimeEdit(QTime(0, 0))
+        self.timeedit.setObjectName('timeCounter')
         self.timeedit.setStyle(QStyleFactory.create('fusion'))
         self.timeedit.setFrame(False)
         self.timeedit.setDisplayFormat('hh:mm:ss.zzz')
         self.timeedit.timeChanged.connect(self.timeChangeHandler)
-        separator = QLabel('/', objectName='timeSeparator')
-        self.duration = QLabel('00:00:00.000', objectName='timeDuration')
+        separator = QLabel('/')
+        separator.setObjectName('timeSeparator')
+        self.duration = QLabel('00:00:00.000')
+        self.duration.setObjectName('timeDuration')
         layout = QHBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(self.timeedit)
@@ -98,12 +109,16 @@ class FrameCounter(QWidget):
     def __init__(self, parent=None):
         super(FrameCounter, self).__init__(parent)
         self.parent = parent
-        self.currentframe = QSpinBox(self, objectName='frameCounter')
+        self.currentframe = QSpinBox(self)
+        self.currentframe.setObjectName('frameCounter')
+        self.currentframe.setStyle(QStyleFactory.create('fusion'))
         self.currentframe.setFrame(False)
         self.currentframe.setAlignment(Qt.AlignRight)
         self.currentframe.valueChanged.connect(self.frameChangeHandler)
-        separator = QLabel('/', objectName='frameSeparator')
-        self.framecount = QLabel('0000', objectName='frameCount')
+        separator = QLabel('/')
+        separator.setObjectName('frameSeparator')
+        self.framecount = QLabel('0000')
+        self.framecount.setObjectName('frameCount')
         layout = QHBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(self.currentframe)
@@ -155,7 +170,10 @@ class FrameCounter(QWidget):
 class VCProgressBar(QDialog):
     def __init__(self, parent=None, flags=Qt.FramelessWindowHint):
         super(VCProgressBar, self).__init__(parent, flags)
-        self._progress = QProgressBar(parent)
+        self.parent = parent
+        if sys.platform.startswith('linux'):
+            self.taskbar = TaskbarProgress(self)
+        self._progress = QProgressBar(self.parent)
         self._progress.setRange(0, 0)
         self._progress.setTextVisible(False)
         self._progress.setStyle(QStyleFactory.create('fusion'))
@@ -165,8 +183,11 @@ class VCProgressBar(QDialog):
         layout.addWidget(self._progress, 0, 0)
         layout.addWidget(self._label, 0, 0)
         self.setWindowModality(Qt.ApplicationModal)
-        self.setMinimumWidth(400)
+        self.setMinimumWidth(500)
         self.setLayout(layout)
+
+    def value(self) -> int:
+        return self._progress.value()
 
     def setStyle(self, style: QStyle) -> None:
         self._progress.setStyle(style)
@@ -184,4 +205,142 @@ class VCProgressBar(QDialog):
         self._progress.setRange(minval, maxval)
 
     def setValue(self, val: int) -> None:
+        if sys.platform.startswith('linux'):
+            self.taskbar.setProgress(float(val / self._progress.maximum()), True)
         self._progress.setValue(val)
+
+    def updateProgress(self, value: int, text: str) -> None:
+        self.setValue(value)
+        self.setText(text)
+        qApp.processEvents()
+
+    @pyqtSlot()
+    def close(self) -> None:
+        if sys.platform.startswith('linux'):
+            self.taskbar.clear()
+        self.deleteLater()
+        super(VCProgressBar, self).close()
+
+
+class VolumeSlider(QSlider):
+    def __init__(self, parent=None, **kwargs):
+        super(VolumeSlider, self).__init__(parent, **kwargs)
+        self.setObjectName('volumeslider')
+        self.valueChanged.connect(self.showTooltip)
+        self.offset = QPoint(0, -45)
+        self.setStyle(QStyleFactory.create('Fusion'))
+
+    @pyqtSlot(int)
+    def showTooltip(self, value: int) -> None:
+        opt = QStyleOptionSlider()
+        self.initStyleOption(opt)
+        handle = self.style().subControlRect(QStyle.CC_Slider, opt, QStyle.SC_SliderHandle, self)
+        pos = handle.topLeft()
+        pos += self.offset
+        globalPos = self.mapToGlobal(pos)
+        QToolTip.showText(globalPos, str('{0}%'.format(value)), self)
+
+
+class ClipErrorsDialog(QDialog):
+
+    class VCToolBox(QToolBox):
+        def __init__(self, parent=None, **kwargs):
+            super(ClipErrorsDialog.VCToolBox, self).__init__(parent, **kwargs)
+            self.parent = parent
+            self.installEventFilter(self)
+
+        def showEvent(self, event: QShowEvent):
+            self.adjustSize()
+            self.parent.adjustSize()
+
+        def eventFilter(self, obj: QObject, event: QEvent) -> bool:
+            if event.type() == QEvent.Enter:
+                qApp.setOverrideCursor(Qt.PointingHandCursor)
+            elif event.type() == QEvent.Leave:
+                qApp.restoreOverrideCursor()
+            return super(ClipErrorsDialog.VCToolBox, self).eventFilter(obj, event)
+
+    def __init__(self, errors: list, parent=None, flags=Qt.WindowCloseButtonHint):
+        super(ClipErrorsDialog, self).__init__(parent, flags)
+        self.errors = errors
+        self.parent = parent
+        self.setWindowModality(Qt.ApplicationModal)
+        self.setWindowTitle('Cannot add media file(s)')
+        self.headingcolor = '#C681D5' if self.parent.theme == 'dark' else '#642C68'
+        self.pencolor = '#FFF' if self.parent.theme == 'dark' else '#222'
+        self.toolbox = ClipErrorsDialog.VCToolBox(self)
+        self.toolbox.currentChanged.connect(self.selectItem)
+        self.detailedLabel = QLabel(self)
+        self.buttons = QDialogButtonBox(self)
+        closebutton = self.buttons.addButton(QDialogButtonBox.Close)
+        closebutton.clicked.connect(self.close)
+        closebutton.setDefault(True)
+        closebutton.setAutoDefault(True)
+        closebutton.setCursor(Qt.PointingHandCursor)
+        closebutton.setFocus()
+        introLabel = self.intro()
+        introLabel.setWordWrap(True)
+        layout = QVBoxLayout()
+        layout.addWidget(introLabel)
+        layout.addSpacing(10)
+        layout.addWidget(self.toolbox)
+        layout.addSpacing(10)
+        layout.addWidget(self.buttons)
+        self.setLayout(layout)
+        self.parseErrors()
+
+    def intro(self) -> QLabel:
+        return QLabel('''
+        <style>
+            h1 {
+                text-align: center;
+                color: %s;
+                font-family: "Futura-Light", sans-serif;
+                font-weight: 400;
+            }
+            p {
+                font-family: "Open Sans", sans-serif;
+                color: %s;
+            }
+        </style>
+        <h1>Invalid media files detected</h1>
+        <p>
+            One or more media files were prevented from being added to your project. Each rejected file is listed below.
+            Clicking on filenames will reveal error information explaining why it was not added. 
+        </p>
+        ''' % (self.headingcolor, self.pencolor))
+
+    def selectItem(self, index: int) -> None:
+        self.toolbox.adjustSize()
+        self.adjustSize()
+
+    def parseErrors(self) -> None:
+        for file, error in self.errors:
+            if not len(error):
+                error = '<div align="center">Invalid media file.<br/><br/>This is not a media file or the file ' + \
+                        'is irreversibly corrupt.</div>'
+            errorLabel = QLabel(error, self)
+            index = self.toolbox.addItem(errorLabel, os.path.basename(file))
+            self.toolbox.setItemToolTip(index, file)
+
+    def setDetailedMessage(self, msg: str) -> None:
+        msg = '''
+        <style>
+            h1 {
+                text-align: center;
+                color: %s;
+                font-family: "Futura-Light", sans-serif;
+                font-weight: 400;
+            }
+            p {
+                font-family: "Open Sans", sans-serif;
+                font-weight: 300;
+                color: %s;
+            }
+        </style>
+        <h1>Help :: Adding media files</h1>
+        %s''' % (self.headingcolor, self.pencolor, msg)
+        helpbutton = self.buttons.addButton('Help', QDialogButtonBox.ResetRole)
+        helpbutton.setCursor(Qt.PointingHandCursor)
+        helpbutton.clicked.connect(lambda: QMessageBox.information(self, 'Help :: Adding Media Files', msg,
+                                                                   QMessageBox.Ok))

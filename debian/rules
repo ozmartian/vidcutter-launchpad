@@ -3,4 +3,3 @@
 export PYBUILD_NAME=vidcutter
 %:
 	dh $@ --with python3 --buildsystem=pybuild
-

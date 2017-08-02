@@ -1,13 +1,47 @@
+### 4.0.0 Pre-Release available. Check [Releases](https://github.com/ozmartian/vidcutter/releases) page for the details. 4.0.0 official release will be this weekend July 29/30 
+
+---------
+
+[![Latest Release](http://tvlinker.ozmartians.com/images/button-latest-release.png)](https://github.com/ozmartian/vidcutter/releases/latest)
+
 ![VidCutter](https://raw.githubusercontent.com/ozmartian/vidcutter/gh-pages/vidcutter-banner.png)
 
-![Build Status](https://travis-ci.org/ozmartian/vidcutter.svg?branch=master) 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/425a00c7c6af446ba87c6152567d9f7e)](https://www.codacy.com/app/ozmartian/vidcutter?utm_source=github.com&utm_medium=referral&utm_content=ozmartian/vidcutter&utm_campaign=badger)
+[![Build Status](https://travis-ci.org/ozmartian/vidcutter.svg)](https://travis-ci.org/ozmartian/vidcutter)
+[![Build Status](https://ci.appveyor.com/api/projects/status/jgasythb2vqsxy7v?svg=true)](https://ci.appveyor.com/project/ozmartian/vidcutter)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/425a00c7c6af446ba87c6152567d9f7e)](https://www.codacy.com/app/ozmartian/vidcutter)
+
+## v4.0 IS NEARLY HERE
+
+VidCutter 4.0 is nearly ready for release. Just a few bugs and features to straighten out. This release sees OpenGL-callback rendering to a native OpenGL window so no dependency of window
+to keep things sane anymore. This change brings full macOS support back finally! This is not to be confused with mpv's standard
+OpenGL video output option that you may already be familiar with, this is to do with how VidCutter gets video from mpv and presents it which is now via an OpenGL widget. This will not 
+be too noticeable a change to most users who have no issues with the app, except for MUCH MUCH better stability and quality playback. The big deal comes with those who have had problems
+due to old graphics hardware w/ no hardware acceleration etc. Basically, all the problem systems I've tested with problems in the past all work flawlessly now, including macOS. This has been 
+a personal goal of mine in cracking the OpenGL w/ mpv on PyQt5 challenge.
+
+Besides the above, there are LOADS of fixes, an improved thumbnailed timeline w/ larger previews + better threading to get it all working faster in the background
+without slowing your workflow down. Adding your own clips for joining, either stand-alone to join a set of files, or inserted into a project you are cutting with the app but
+clips must share the same frame size (width x height) with clips already in your clip index as well as audio/video format (MPEG container based codecs should be compatible with each other e.g. mkv, mp4, hevc etc.).
+
+***
 
 ### Windows + macOS Users
 
 Native installers for Windows and macOS are available on the releases page with every new version, or just click the button below. 
 
-<p style="text-align:center;"><a href="https://github.com/ozmartian/vidcutter/releases/latest"><img alt="Latest Release" src="http://tvlinker.ozmartians.com/images/button-latest-release.png" style="max-width:100%;"></a></p>
+#### Chocolatey package
+
+VidCutter has finally been approved + published in the [Chocolatey](https://chocolatey.org) public repository (its a package manager like in Linux but
+for Windows).
+
+  To install VidCutter, run the following command from the command line or from PowerShell:
+  ```
+  C:\> choco install vidcutter
+  ```
+  To upgrade VidCutter, run the following command from the command line or from PowerShell:
+  ```
+  C:\> choco upgrade vidcutter
+  ```
 
 ***
 

@@ -22,11 +22,10 @@
 #
 #######################################################################
 
-import sys
 import logging
 
 from PyQt5.QtCore import QSize, Qt
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtGui import QCloseEvent, QPixmap
 from PyQt5.QtWidgets import QDialog, QDialogButtonBox, QLabel, QSizePolicy, QTextBrowser, QHBoxLayout, QVBoxLayout
 
 
@@ -42,10 +41,6 @@ class VideoInfo(QDialog):
         self.logger = logging.getLogger(__name__)
         self.parent = parent
         self.setObjectName('videoinfo')
-        if not hasattr(self.parent, 'videoService'):
-            self.logger.error('VideoService class unavailable in parent')
-            sys.stderr.write('VideoService class unavailable in parent')
-            raise AttributeError('VideoService class unavailable in parent')
 
         self.setContentsMargins(0, 0, 0, 0)
         self.setWindowModality(Qt.WindowModal)
@@ -60,9 +55,9 @@ class VideoInfo(QDialog):
         margin-top: -10px;
     }
     td i {
-        font-family: "Futura LT", sans-serif;
+        font-family: "Futura-Light", sans-serif;
         font-weight: 500;
-        font-style: normal;f
+        font-style: normal;
         text-align: right;
         color: %s;
         white-space: nowrap;
@@ -75,10 +70,12 @@ class VideoInfo(QDialog):
                                                         self.parent.videoService.metadata(media))
 
         content = QTextBrowser(self.parent)
+        content.setStyleSheet('QTextBrowser { border: none; background-color: transparent; }')
+        content.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         content.setHtml(metadata)
 
-        buttons = QDialogButtonBox(QDialogButtonBox.Close)
-        buttons.rejected.connect(self.close)
+        buttons = QDialogButtonBox(QDialogButtonBox.Ok)
+        buttons.accepted.connect(self.close)
 
         layout = QVBoxLayout()
         layout.addWidget(QLabel(pixmap=QPixmap(':/images/%s/mediainfo-heading.png' % self.parent.theme)))
@@ -98,3 +95,7 @@ class VideoInfo(QDialog):
             layout.addWidget(buttons)
 
         self.setLayout(layout)
+
+    def closeEvent(self, event: QCloseEvent):
+        self.deleteLater()
+        super(VideoInfo, self).closeEvent(event)

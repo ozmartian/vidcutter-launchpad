@@ -22,9 +22,8 @@
 #
 #######################################################################
 
-__version__ = '3.5.0'
+__author__      = 'Pete Alexandrou'
+__email__       = 'pete@ozmartians.com'
+__website__     = 'http://vidcutter.ozmartians.com'
 
-__author__ = 'Pete Alexandrou'
-__email__ = 'pete@ozmartians.com'
-
-__packager__ = 'deb'  # [ pypi | arch | deb ]
+__version__     = '4.0.0'

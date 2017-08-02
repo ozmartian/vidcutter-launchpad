@@ -34,8 +34,7 @@ QWidget#videoplayer {
 }
 
 QWidget#novideoWidget {
-    border: 1px solid #4D5355;
-    background: #000 url(:/images/startup-backdrop.png) no-repeat center center;
+    border-image: url(':/images/startup-backdrop.png') 0 0 0 0 stretch stretch;
 }
 
 QWidget#genericdialog {
@@ -44,6 +43,11 @@ QWidget#genericdialog {
 
 QWidget#genericdialog2 {
     border-image: url(':/images/dialog-backdrop-02.png') 0 0 0 0 stretch stretch;
+}
+
+QWidget#genericdialog3, QDialog#notification {
+    border-image: url(':/images/dark/background_complete.png') 0 0 0 0 stretch stretch;
+    background: #000;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -66,14 +70,14 @@ QDialog#updaterdialog {
 /* -------------------------------------------------------------------------- */
 
 QToolBar#appcontrols {
-    spacing: 25px;
+    spacing: 8px;
 }
 
 QToolBar#appcontrols QToolButton {
     padding: 1px 2px;
     margin: 0;
     color: #EAEAEA;
-    font-size: 10pt;
+    font-size: 13px;
     font-weight: 400;
     font-family: "Open Sans", sans-serif;
     line-height: 80%;
@@ -101,6 +105,10 @@ QToolBar#appcontrols QToolButton#saveButton {
 
 /* -------------------------------------------------------------------------- */
 
+QListView#settingsmenu {
+    background-color: #0C0F10;
+}
+
 QListView#cliplist {
     border-radius: 0;
     border: none;
@@ -113,6 +121,25 @@ QListView#cliplist {
 QListView::item#cliplist {
     padding: 10px;
     color: #EAEAEA;
+}
+
+QListView#settingsmenu {
+    show-decoration-selected: 1;
+    outline: 0;
+}
+
+QListView::item#settingsmenu {
+    width: 100%;
+    padding-bottom: 5px;
+}
+
+QListView::item:hover#settingsmenu {
+    background: rgba(136, 136, 136, 0.4);
+}
+
+QListView::item:selected#settingsmenu {
+    color: #FFF;
+    background: #888;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -151,10 +178,21 @@ QLabel#logowidget {
     outline: none;
 }
 
-/* -------------------------------------------------------------------------- */
+QLabel#decodinglabel, QLabel#ratiolabel, QLabel#keepclipslabel,
+QLabel#nativedialogslabel, QLabel#seeksettingslabel, QLabel#zoomlabel {
+    font-family: "Open Sans", sans-serif;
+    font-size: 11px;
+    color: #EFF0F1;
+}
 
-QMenu::item:disabled {
-    color: rgba(102, 102, 102, 0.5)
+
+QLabel#decodinglabel, QLabel#ratiolabel, QLabel#keepclipslabel,
+QLabel#nativedialogslabel {
+    margin: 2px 5px 10px 22px;
+}
+
+QLabel#seeksettingslabel, QLabel#zoomlabel {
+    margin: 15px 5px 10px 5px;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -167,6 +205,23 @@ QGroupBox#counterwidgets {
     padding: 0;
 }
 
+#settingsdialog QGroupBox {
+    font-weight: bold;
+    border: 1px solid #4D5355;
+    border-radius: 3px;
+    margin-top: 1ex;
+    padding-top: 15px;
+    background-color: #0C0F10;
+    color: #444;
+}
+
+#settingsdialog QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
+    padding: 0 3px;
+    background-color: #EFF0F1;
+}
+
 /* -------------------------------------------------------------------------- */
 
 QMessageBox {
@@ -176,24 +231,169 @@ QMessageBox {
 
 /* -------------------------------------------------------------------------- */
 
-QPushButton#menuButton {
-    border-image: url(:/images/dark/menu.png);
-    width: 40px;
-    height: 42px;
+QDialogButtonBox QPushButton, QDialog#notification QPushButton {
+    padding: 5px 8px;
 }
 
-QPushButton:hover#menuButton, QPushButton:pressed#menuButton {
+QDialogButtonBox QPushButton, #clipindextools QPushButton, QDialog#notification QPushButton {
+    color: #EFF0F1;
+    background-color: #31363B;
+    border: 1px solid #4D5355;
+    border-radius: 2px;
+    outline: none;
+    min-width: 50px;
+}
+
+#clipindextools QPushButton {
+    border-radius: 0;
+    width: 50%;
+    height: 26px;
+    padding-left: 5px;
+}
+
+#clipindextools QPushButton#clipadd {
+    background: #31363B url(:images/dark/clipindex-add.png) no-repeat left center;
+}
+
+#clipindextools QPushButton:hover#clipadd,
+#clipindextools QPushButton:focus#clipadd,
+#clipindextools QPushButton:pressed#clipadd {
+    background: #642C68 url(:images/dark/clipindex-add-on.png) no-repeat left center;
+}
+
+#clipindextools QPushButton#clipremove {
+    background: #31363B url(:images/dark/clipindex-remove.png) no-repeat right center;
+}
+
+#clipindextools QPushButton:hover#clipremove,
+#clipindextools QPushButton:focus#clipremove,
+#clipindextools QPushButton:pressed#clipremove {
+    background: #642C68 url(:images/dark/clipindex-remove-on.png) no-repeat right center;
+}
+
+QDialogButtonBox QPushButton:hover, #clipindextools QPushButton:hover, QDialog#notification QPushButton:hover {
+    border: 1px solid #642C68;
+}
+
+QDialogButtonBox QPushButton:focus,
+QDialogButtonBox QPushButton:pressed,
+#clipindextools QPushButton:focus,
+#clipindextools QPushButton:pressed,
+QDialog#notification QPushButton,
+QDialog#notification QPushButton:focus,
+QDialog#notification QPushButton:pressed {
+    background-color: #642C68;
+    border: 1px solid #EFF0F1;
+}
+
+QPushButton#mediainfoButton {
+    border-image: url(:/images/dark/info.png);
+    width: 33px;
+    height: 32px;
+}
+
+QPushButton:hover#mediainfoButton {
+    border-image: url(:/images/dark/info-hover.png);
+}
+
+QPushButton:pressed#mediainfoButton {
+    border-image: url(:/images/dark/info-active.png);
+}
+
+QPushButton:disabled#mediainfoButton {
+    border-image: url(:/images/dark/info-disabled.png);
+}
+
+QPushButton#settingsButton {
+    border-image: url(:/images/dark/settings.png);
+    width: 33px;
+    height: 32px;
+}
+
+QPushButton:hover#settingsButton {
+    border-image: url(:/images/dark/settings-hover.png);
+}
+
+QPushButton:pressed#settingsButton {
+    border-image: url(:/images/dark/settings-active.png);
+}
+
+QPushButton#menuButton {
+    border-image: url(:/images/dark/menu.png);
+    width: 33px;
+    height: 32px;
+}
+
+QPushButton:hover#menuButton {
+    border-image: url(:/images/dark/menu-hover.png);
+}
+
+QPushButton:pressed#menuButton {
     border-image: url(:/images/dark/menu-active.png);
 }
 
-QPushButton::menu-indicator#menuButton {
-    left: -2000px;
+QPushButton::menu-indicator#menuButton, #clipindextools QPushButton::menu-indicator {
+    left: -4000px;
 }
 
-QPushButton#muteButton, QPushButton#menuButton {
+QPushButton#thumbnailsButton, QPushButton#osdButton, QPushButton#consoleButton,
+QPushButton#muteButton, QPushButton#settingsButton, QPushButton#menuButton, QPushButton#fullscreenButton {
     background-color: transparent;
     border: none;
     outline: none;
+}
+
+QPushButton#thumbnailsButton, QPushButton#osdButton, QPushButton#consoleButton {
+    margin: 0;
+    padding: 0;
+}
+
+QPushButton#thumbnailsButton {
+    border-image: url(:/images/dark/thumbnails-off.png);
+    width: 32px;
+    height: 31px;
+}
+
+QPushButton#thumbnailsButton:hover {
+    border-image: url(:/images/dark/thumbnails-hover.png);
+}
+
+QPushButton#thumbnailsButton:pressed, QPushButton#thumbnailsButton:checked {
+    border-image: url(:/images/dark/thumbnails-on.png);
+}
+
+QPushButton#osdButton {
+    border-image: url(:/images/dark/osd-off.png);
+    width: 31px;
+    height: 31px;
+}
+
+QPushButton#osdButton:hover {
+    border-image: url(:/images/dark/osd-hover.png);
+}
+
+QPushButton#osdButton:pressed, QPushButton#osdButton:checked {
+    border-image: url(:/images/dark/osd-on.png);
+}
+
+QPushButton#consoleButton {
+    border-image: url(:/images/dark/console-off.png);
+    width: 32px;
+    height: 31px;
+}
+
+QPushButton#consoleButton:hover {
+    border-image: url(:/images/dark/console-hover.png);
+}
+
+QPushButton#consoleButton:pressed, QPushButton#consoleButton:checked {
+    border-image: url(:/images/dark/console-on.png);
+}
+
+/* -------------------------------------------------------------------------- */
+
+QMenu::item:disabled, #clipindextools QPushButton:disabled {
+    color: rgba(102, 102, 102, 0.5);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -232,13 +432,8 @@ QStatusBar::item {
 
 /* -------------------------------------------------------------------------- */
 
-QTextBrowser {
-    background-color: rgba(12, 15, 16, 0.9);
-    color: #FFF;
-}
-
 #aboutwidget QTextBrowser {
-    border: no  ne;
+    border: none;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -251,21 +446,21 @@ QTabWidget::tab-bar:top {
     top: 1px;
 }
 
-QTabBar::tab {
+QTabBar::tab, QToolBox::tab {
     border: 1px solid #999;
 }
 
-QTabBar::tab:selected {
+QTabBar::tab:selected, QToolBox::tab:selected {
     background: #642C68;
     color: #FFF;
 }
 
-QTabBar::tab:!selected {
+QTabBar::tab:!selected, QToolBox::tab:!selected {
     background: silver;
     color: #444;
 }
 
-QTabBar::tab:!selected:hover {
+QTabBar::tab:!selected:hover, QToolBox::tab:!selected:hover {
     background: #642C68;
     color: #FFF;
 }
@@ -288,6 +483,17 @@ QTabBar::tab:top:last,
 QTabBar::tab:top:only-one {
     margin-right: 0;
 }
+/* -------------------------------------------------------------------------- */
+
+QSlider::handle#volumeslider {
+    background: transparent url(:/images/slider-knob.png) no-repeat center center;
+    width: 18px;
+    height: 18px;
+}
+
+QSlider::handle:hover#volumeslider, QSlider::handle:pressed#volumeslider {
+    background: transparent url(:/images/slider-knob-active.png) no-repeat center center;
+}
 
 /* -------------------------------------------------------------------------- */
 
@@ -297,8 +503,19 @@ VCProgressBar {
 }
 
 VCProgressBar QLabel {
-    font-family: "Futura LT", sans-serif;
+    font-family: "Futura-Light", sans-serif;
     font-size: 15px;
-    font-weight: 500;
+    font-weight: 400;
     color: #FFF;
+}
+
+VCProgressBar QProgressBar::chunk {
+    background-color: #642C68;
+    margin: 1px;
+}
+
+/* -------------------------------------------------------------------------- */
+
+QToolTip {
+    border: 1px solid #101517;
 }

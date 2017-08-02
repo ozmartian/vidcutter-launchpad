@@ -19,10 +19,14 @@ vidcutter/bin/
 bin/
 .DS_Store
 _packaging/appimage/*/
+_packaging/pyqtdeploy/
+_pyqtdeploy
 testing
 _build/pyinstaller/libmpv
 mpv-1.dll
 D3DCompiler_*.dll
 d3dcompiler_*.dll
 MediaInfo.dll
-opengl*
+*.*.nupkg
+*.so
+*.pyd

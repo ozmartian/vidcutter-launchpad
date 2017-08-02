@@ -7,7 +7,7 @@ description: |
     or a diploma in multimedia. VidCutter focuses on
     getting the job done using tried and true tech in its
     arsenal via mpv and FFmpeg.
-
+icon: data/icons/vidcutter.png
 grade: devel
 confinement: devmode
 
@@ -15,6 +15,7 @@ apps:
   vidcutter:
     command: desktop-launch vidcutter
     plugs: [home, pulseaudio, x11, opengl]
+    desktop: data/desktop/vidcutter.desktop
 
 parts:
   vidcutter:

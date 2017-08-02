@@ -33,6 +33,8 @@ from PyQt5.QtGui import QCloseEvent
 from PyQt5.QtWidgets import qApp, QDialog, QDialogButtonBox, QLabel, QTabWidget, QTextBrowser, QVBoxLayout
 from sip import SIP_VERSION_STR
 
+import vidcutter.libs.mpv as mpv
+
 
 class About(QDialog):
     def __init__(self, parent=None, f=Qt.WindowCloseButtonHint):
@@ -41,8 +43,7 @@ class About(QDialog):
         self.setObjectName('aboutwidget')
         self.setContentsMargins(0, 0, 0, 0)
         self.setWindowModality(Qt.ApplicationModal)
-        builddate = datetime.fromtimestamp(os.path.getmtime(
-            self.parent.parent.get_path('__init__.py',override=True))).strftime('%d %b %Y')
+        builddate = datetime.fromtimestamp(os.path.getmtime(mpv.__file__)).strftime('%d %b %Y')
         pencolor1 = '#9A45A2' if self.parent.theme == 'dark' else '#642C68'
         pencolor2 = '#FFF' if self.parent.theme == 'dark' else '#000'
         header = QLabel('''
@@ -53,11 +54,11 @@ class About(QDialog):
                     <img src=":/images/vidcutter-small.png" width="82" />
                 </td>
                 <td style="padding:4px;">
-                    <div style="font-family:'Futura LT', sans-serif;font-size:40px;font-weight:400;color:%s;">
+                    <div style="font-family:'Futura-Light', sans-serif;font-size:40px;font-weight:400;color:%s;">
                         <span style="font-size:58px;">V</span>ID<span style="font-size:58px;">C</span>UTTER
                     </div>
                     &nbsp;&nbsp;
-                    <div style="padding:0; margin:0; margin-left:20px;">
+                    <div style="padding:0; margin:0; margin-left:35px;">
                         <table border="0" cellpadding="2" cellspacing="0">
                         <tr valign="bottom">
                             <td style="text-align:right;font-size:10pt;font-weight:500;color:%s;">version:</td>
@@ -73,7 +74,7 @@ class About(QDialog):
                         </table>
                     </div>
                 </td>
-                <td align="right" style="padding:30px 15px 15px 15px;">
+                <td valign="bottom" align="right" style="padding:30px 15px 15px 15px;">
                     <div style="padding:20px 0 10px 0;">
                         <img src=":/images/%s/python.png"/>
                     </div>
@@ -87,9 +88,8 @@ class About(QDialog):
         header.setStyleSheet('border:none;')
         self.tab_about = AboutTab(self)
         self.tab_credits = CreditsTab(self)
-        self.tab_license = LicenseTab()
+        self.tab_license = LicenseTab(self)
         tabs = QTabWidget()
-        tabs.setFocusPolicy(Qt.NoFocus)
         tabs.addTab(self.tab_about, 'About')
         tabs.addTab(self.tab_credits, 'Credits')
         tabs.addTab(self.tab_license, 'License')
@@ -108,7 +108,7 @@ class About(QDialog):
     def get_size(mode: str = 'NORMAL') -> QSize:
         modes = {
             'LOW': QSize(450, 250),
-            'NORMAL': QSize(540, 460),
+            'NORMAL': QSize(515, 480),
             'HIGH': QSize(1080, 920)
         }
         return modes[mode]
@@ -125,6 +125,10 @@ class BaseTab(QTextBrowser):
     def __init__(self, parent=None):
         super(BaseTab, self).__init__(parent)
         self.setOpenExternalLinks(True)
+        if parent.parent.theme == 'dark':
+            self.setStyleSheet('QTextBrowser { background-color: rgba(12, 15, 16, 210); color: #FFF; }')
+        else:
+            self.setStyleSheet('QTextBrowser { background-color: rgba(255, 255, 255, 200); color: #000; }')
 
 
 class AboutTab(BaseTab):
@@ -132,9 +136,11 @@ class AboutTab(BaseTab):
         super(AboutTab, self).__init__(parent)
         self.parent = parent
         linebreak = '<br/>' if sys.platform == 'win32' else '&nbsp;&nbsp;&nbsp;'
+        # noinspection PyBroadException
         try:
-            ffmpeg_version = self.parent.parent.mediaPlayer.ffmpeg_version
-        except AttributeError:
+            ffmpeg_version = self.parent.parent.videoService.version()
+            # ffmpeg_version = self.parent.parent.mpvWidget.mpv.get_property('ffmpeg-version')
+        except:
             ffmpeg_version = '2.8.10'
         html = '''
 <style>
@@ -156,26 +162,28 @@ class AboutTab(BaseTab):
                 <b>SIP:</b> %s
             </p> 
             <p style="font-size:13px;">
-                Copyright &copy; 2017 <a href="mailto:pete@ozmartians.com">Pete Alexandrou</a>
+                Copyright &copy; %s <a href="mailto:pete@ozmartians.com">Pete Alexandrou</a>
                 <br/>
                 Website: <a href="http://vidcutter.ozmartians.com">http://vidcutter.ozmartians.com</a>
             </p>
             <p style="font-size:13px;">
-                Found a bug? Then why not <a href="https://github.com/ozmartian/vidcutter/issues">REPORT IT HERE</a>
+                Found a bug? You can <a href="https://github.com/ozmartian/vidcutter/issues">REPORT IT HERE</a>.
             </p>
             <p style="font-size:11px; margin-top:15px;">
                 This program is free software; you can redistribute it and/or
                 modify it under the terms of the GNU General Public License
-                version 3, or (at your option) any later version.
-                This software uses libraries from the <a href="https://mpv.io">mpv</a> and
+                version 3, or (at your option) any later version. This software uses code
+                produced by the <a href="https://mpv.io">mpv</a> and
                 <a href="https://www.ffmpeg.org">FFmpeg</a> projects under the
-                <a href="https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html">LGPLv2.1</a> license.
+                <a href="https://www.gnu.org/licenses/old-licenses/gpl-2.0.html">GPLv2.0</a> and
+                <a href="https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html">LGPLv2.1</a>
+                licenses respectively.
             </p>
         </td>
     </tr>
 </table>''' % ('#EA95FF' if self.parent.parent.theme == 'dark' else '#441D4E',
-               self.parent.parent.mediaPlayer.mpv_version.replace('mpv ', ''), linebreak,
-               ffmpeg_version, sys.version.split(' ')[0], PYQT_VERSION_STR, SIP_VERSION_STR)
+               self.parent.parent.mpvWidget.mpv.get_property('mpv-version').replace('mpv ', ''), linebreak,
+               ffmpeg_version, sys.version.split(' ')[0], PYQT_VERSION_STR, SIP_VERSION_STR, datetime.now().year)
         self.setHtml(html)
 
 
@@ -195,36 +203,31 @@ class CreditsTab(BaseTab):
             <tr>
                 <td width="200">
                     <p>
+                        <a href="https://github.com/marcan/pympv">pympv</a>
+                        -
+                        GPLv3+
+                    </p>
+                    <p>
                         <a href="http://ffmpeg.org">FFmpeg</a>
                         -
                         GPLv2+
                     </p>
                     <p>
-                        <a href="http://mpv.io">mpv</a>
-                        -
-                        GPLv2+
-                    </p>
-                    <p>
-                        <a href="https://mpv.srsfckn.biz">libmpv</a>
+                        <a href="https://www.riverbankcomputing.com/software/pyqt">PyQt5</a>
                         -
                         GPLv3+
-                    </p>
-                    <p>
-                        <a href="https://github.com/jaseg/python-mpv">python-mpv</a>
-                        -
-                        AGPLv3
                     </p>
                 </td>
                 <td width="200">
                     <p>
+                        <a href="http://mpv.io">mpv (libmpv)</a>
+                        -
+                        GPLv2+
+                    </p>
+                    <p>
                         <a href="http://mediaarea.net/mediainfo">MediaInfo</a>
                         -
                         BSD-style
-                    </p>
-                    <p>
-                        <a href="https://www.riverbankcomputing.com/software/pyqt">PyQt5</a>
-                        -
-                        GPLv3+
                     </p>
                     <p>
                         <a href="https://www.qt.io">Qt5</a>
@@ -237,7 +240,7 @@ class CreditsTab(BaseTab):
 
 
 class LicenseTab(BaseTab):
-    def __init__(self):
-        super(LicenseTab, self).__init__()
+    def __init__(self, parent=None):
+        super(LicenseTab, self).__init__(parent)
         self.setObjectName('license')
         self.setSource(QUrl('qrc:/license.html'))

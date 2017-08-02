@@ -24,18 +24,22 @@
 
 import sys
 
-from PyQt5.QtCore import pyqtSlot, QEvent, QObject, Qt
-from PyQt5.QtWidgets import QAction, qApp, QStyleFactory, QToolBar, QToolButton
+from PyQt5.QtCore import pyqtSlot, QEvent, QObject, QSize, Qt
+from PyQt5.QtWidgets import qApp, QStyleFactory, QToolBar, QToolButton
 
 
 class VideoToolBar(QToolBar):
-    def __init__(self, parent=None, *arg, **kwargs):
-        super(VideoToolBar, self).__init__(parent, *arg, **kwargs)
+    def __init__(self, parent=None):
+        super(VideoToolBar, self).__init__(parent)
         self.parent = parent
         self.setObjectName('appcontrols')
         self.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
+        self.setFloatable(False)
+        self.setMovable(False)
+        self.setIconSize(QSize(50, 53))
         if sys.platform == 'darwin':
             self.setStyle(QStyleFactory.create('Fusion'))
+            self.setStyleSheet('QToolBar QToolButton { font-size: 12pt; }')
 
     def disableTooltips(self) -> None:
         buttonlist = self.findChildren(QToolButton)
@@ -44,33 +48,25 @@ class VideoToolBar(QToolBar):
             if button == buttonlist[len(buttonlist)-1]:
                 button.setObjectName('saveButton')
 
-    @pyqtSlot(QAction)
-    def setLabels(self, action: QAction) -> None:
-        if action == self.parent.besideLabelsAction:
-            self.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
-            for button in self.findChildren(QToolButton):
-                button.setText(button.text().replace(' ', '\n'))
-        elif action == self.parent.underLabelsAction:
-            self.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
-            for button in self.findChildren(QToolButton):
-                button.setText(button.text().replace('\n', ' '))
-        elif action == self.parent.noLabelsAction:
-            self.setToolButtonStyle(Qt.ToolButtonIconOnly)
+    @pyqtSlot(int)
+    def setLabels(self, option_id: int) -> None:
+        if option_id == 3:
+            self.setLabelByType('beside')
+        elif option_id == 2:
+            self.setLabelByType('under')
+        elif option_id == 1:
+            self.setLabelByType('none')
 
     def setLabelByType(self, label_type: str) -> None:
         if label_type == 'beside':
-            self.parent.besideLabelsAction.setChecked(True)
             self.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
-            for button in self.findChildren(QToolButton):
-                button.setText(button.text().replace(' ', '\n'))
+            [button.setText(button.text().replace(' ', '\n')) for button in self.findChildren(QToolButton)]
         elif label_type == 'under':
-            self.parent.underLabelsAction.setChecked(True)
             self.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
-            for button in self.findChildren(QToolButton):
-                button.setText(button.text().replace('\n', ' '))
+            [button.setText(button.text().replace('\n', ' ')) for button in self.findChildren(QToolButton)]
         elif label_type == 'none':
-            self.parent.noLabelsAction.setChecked(True)
             self.setToolButtonStyle(Qt.ToolButtonIconOnly)
+        self.parent.settings.setValue('toolbarLabels', label_type)
 
     def eventFilter(self, obj: QObject, event: QEvent) -> bool:
         if event.type() == QEvent.ToolTip:
