@@ -109,7 +109,7 @@ class VideoCutter(QWidget):
         self.keepClips = self.settings.value('keepClips', 'off', type=str) in {'on', 'true'}
         self.nativeDialogs = self.settings.value('nativeDialogs', 'on', type=str) in {'on', 'true'}
         self.timelineThumbs = self.settings.value('timelineThumbs', 'on', type=str) in {'on', 'true'}
-        self.showConsole = self.settings.value('showConsole', 'on', type=str) in {'on', 'true'}
+        self.showConsole = self.settings.value('showConsole', 'off', type=str) in {'on', 'true'}
         self.level1Seek = self.settings.value('level1Seek', 2, type=float)
         self.level2Seek = self.settings.value('level2Seek', 5, type=float)
 
@@ -1128,7 +1128,7 @@ class VideoCutter(QWidget):
                 if not rc or QFile(self.finalFilename).size() < 1000:
                     self.logger.info('join() resulted in 0 length file, trying again without all stream mapping')
                     self.videoService.join(filelist, self.finalFilename, False)
-                if not self.keepClipsAction.isChecked():
+                if not self.keepClips:
                     for f in filelist:
                         clip = self.clipTimes[filelist.index(f)]
                         if not len(clip[3]) and os.path.isfile(f):
