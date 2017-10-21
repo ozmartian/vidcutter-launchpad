@@ -1,0 +1,1 @@
+{"ppa_name":"apps","ppa_owner":"ozmartian","name":"ffmpeg","versions":["7:2.8.10-1~trusty3.1","7:3.2.2+git~trusty"],"distros":[{"name":"trusty","count":14,"ddts":[{"value":14,"time":[2017,3,6]}]}],"ddts":[{"value":14,"time":[2017,3,6]}]}

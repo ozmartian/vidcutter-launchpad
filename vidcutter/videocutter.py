@@ -453,7 +453,8 @@ class VideoCutter(QWidget):
         self.novideoWidget.setLayout(novideoLayout)
 
     def initIcons(self) -> None:
-        self.appIcon = QIcon(':/images/vidcutter.png')
+        # self.appIcon = QIcon(':/images/vidcutter.png')
+        self.appIcon = qApp.windowIcon()
         self.openIcon = QIcon()
         self.openIcon.addFile(':/images/%s/toolbar-open.png' % self.theme, QSize(50, 53), QIcon.Normal)
         self.openIcon.addFile(':/images/%s/toolbar-open-on.png' % self.theme, QSize(50, 53), QIcon.Active)
@@ -534,6 +535,8 @@ class VideoCutter(QWidget):
                                     statusTip='View shortcut key bindings')
         self.settingsAction = QAction(self.settingsIcon, 'Settings', self, triggered=self.showSettings,
                                       statusTip='Configure application settings')
+        self.fullscreenAction = QAction(self.fullscreenIcon, 'Toggle fullscreen', self, triggered=self.toggleFullscreen,
+                                      statusTip='Switch to fullscreen video')
 
     def initToolbar(self) -> None:
         self.toolbar.addAction(self.openAction)
@@ -552,6 +555,7 @@ class VideoCutter(QWidget):
         self.appMenu.addSeparator()
         self.appMenu.addAction(self.settingsAction)
         self.appMenu.addSeparator()
+        self.appMenu.addAction(self.fullscreenAction)
         self.appMenu.addAction(self.mediaInfoAction)
         self.appMenu.addAction(self.keyRefAction)
         self.appMenu.addSeparator()
