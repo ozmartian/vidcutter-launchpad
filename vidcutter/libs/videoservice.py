@@ -36,7 +36,7 @@ from functools import partial
 from PyQt5.QtCore import (pyqtSignal, pyqtSlot, QDir, QFile, QFileInfo, QObject, QProcess, QProcessEnvironment, QSize,
                           QStorageInfo, QTemporaryFile, QTime)
 from PyQt5.QtGui import QPainter, QPixmap
-from PyQt5.QtWidgets import qApp, QMessageBox
+from PyQt5.QtWidgets import QMessageBox
 
 from vidcutter.libs.munch import Munch
 from vidcutter.libs.videoconfig import FFmpegNotFoundException, InvalidMediaException, VideoConfig
@@ -111,7 +111,7 @@ class VideoService(QObject):
         tools = Munch(ffmpeg=None, ffprobe=None, mediainfo=None)
         for backend in tools.keys():
             for exe in VideoService.config.binaries[os.name][backend]:
-                binpath = QDir.toNativeSeparators('{0}/bin/{1}'.format(qApp.applicationDirPath(), exe))
+                binpath = QDir.toNativeSeparators('{0}/bin/{1}'.format(VideoService.getAppPath(), exe))
                 if binpath is not None and os.path.isfile(binpath):
                     tools[backend] = binpath
                     break

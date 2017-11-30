@@ -1,13 +1,10 @@
-[![Latest Release](http://tvlinker.ozmartians.com/images/button-latest-release.png)](https://github.com/ozmartian/vidcutter/releases/latest)
- 
-
 ![VidCutter](http://vidcutter.ozmartians.com/vidcutter-banner.png)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <a href="http://vidcutter.software.informer.com/" target="_blank"><img border="0" src="http://img.informer.com/awards/si-award-clean.png" alt="Software Informer Virus Free award" height="120" width="120" /></a>
 
 [![AUR](https://img.shields.io/aur/version/vidcutter.svg)](https://aur.archlinux.org/packages/vidcutter)
 [![AUR-GIT](https://img.shields.io/aur/version/vidcutter-git.svg)](https://aur.archlinux.org/packages/vidcutter-git)
-[![Build Status](https://travis-ci.org/ozmartian/vidcutter.svg)](https://travis-ci.org/ozmartian/vidcutter)
 [![Build Status](https://ci.appveyor.com/api/projects/status/jgasythb2vqsxy7v?svg=true)](https://ci.appveyor.com/project/ozmartian/vidcutter)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/425a00c7c6af446ba87c6152567d9f7e)](https://www.codacy.com/app/ozmartian/vidcutter)
 
@@ -15,6 +12,8 @@
 ### Windows + macOS Users
 
 Native installers for Windows and macOS are available on the releases page with every new version, or just click the button below. 
+
+[![Latest Releases](http://tvlinker.ozmartians.com/images/button-latest-release.png)](https://github.com/ozmartian/vidcutter/releases/latest)
 
 #### Chocolatey package
 
@@ -39,6 +38,16 @@ for Windows).
 Users can install directly from AUR, package is available in both stable and git-latest versions:
 
     AUR: vidcutter, vidcutter-git
+    
+Using an AUR helper like pacaur (or substitute with yaourt if that is your preference):
+
+    LATEST STABLE RELEASE:
+
+        pacaur -S vidcutter
+
+    LATEST DEVELOPMENT RELEASE:
+    
+        pacaur -S vidcutter-git
 
 #### Ubuntu/Mint/Debian and all other Ubuntu derivatives 
 
@@ -49,29 +58,41 @@ Users can install the latest release via:
 If you are new to PPAs then just issue the following commands in a terminal:
 
     sudo add-apt-repository ppa:ozmartian/apps
-    sudo apt-get update
-    sudo apt-get install vidcutter
+    sudo apt update
+    sudo apt install vidcutter
 
 #### Fedora
 
-Users can install via the RPM available on the releases page or via my custom copr repository:
+The easiest, recommended and endorsed means to get VidCutter installed on Fedora is via the third-party repo UnitedRPMs who should always have the latest release RPM packaged AND all required dependencies missing from Fedora core are there too so its a simple one stop shop for all.
+
+Additionally, I maintain a custom COPR repository at:
 
     suspiria/VidCutter
     
-The commands for a Fedora install via this method are:
+The commands for a Fedora install are:
 
-    dnf copr enable suspiria/VidCutter
-    dnf install vidcutter
+    sudo dnf copr enable suspiria/VidCutter
+    sudo dnf install vidcutter
+    
+Check https://copr.fedorainfracloud.org/coprs/suspiria/VidCutter/ for more details regarding multimedia dependencies. UnitedRPMs or RPMFusion repos will get you on track.
 
 #### openSUSE
 
-VidCutter is available via the Packman third-party repository. Instructions to enable it can be found here:
+https://software.opensuse.org/package/vidcutter
+
+VidCutter was recently added to openSUSE Tumbleweed (rolling-build) official repos and should hopefully make its way to release versions in time. 
+
+VidCutter is also available via the well-known Packman third-party repo. Instructions to enable it can be found here:
 
    https://en.opensuse.org/Additional_package_repositories#Packman
 
 ### AppImage
 
-An AppImage version is also available on the releases page to help all other Linux users.
+An AppImage version is also available on the releases page to help all other Linux users. Current AppImage appears to only work on Trusty-Vivid based distros so please avoid it if you're on an Ubuntu base of 16.04 and above. A new AppImage should be available in the coming days, and requires some changes to bring it up to speed with the latest AppImage spec + runtime.
+
+### FlatPak + Snap ??
+
+I've played around with both of these alternative Linux portable app frameworks and while I have no personal need for them (I dont like the way either of them do things, not to mention both being tightly coupled to their desktop managers or distro i.e. GNOME and Ubuntu respectively. They exist to serve different needs I guess BUT if there are enough requests from you guys I'll hapilly make the effort to get VidCutter packaged and available in respective stores.
 
 ***
 
@@ -89,9 +110,9 @@ Fedora and RedHat users need to enable the RPMFusion repository in order to acce
 
 ***
 
-## Fedora Installation Walkthrough
+## Fedora Example Manual Install Walkthrough
 
-NOTE: a Fedora25 RPM package is now included in release builds so use that. The following remains for reference or troubleshooting.
+#### A COPR repo with builds for all the latest Fedora releases is available, instructions above. The following remains for troubleshooting assistance.
 
 1. Enable RPMFusion Free repository on your system if not already added. Follow the instructions here for your distro/version
 
@@ -109,7 +130,7 @@ NOTE: a Fedora25 RPM package is now included in release builds so use that. The 
     - mediainfo
     - python3-setuptools
 
-5. Download VidCutter3 source code to temp folder location and install via python setuptools as follows:
+5. Download VidCutter source code to a temp folder location and install via python setuptools as follows:
     ```
     $ wget https://github.com/ozmartian/vidcutter/archive/master.tar.gz
     
