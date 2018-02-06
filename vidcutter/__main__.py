@@ -5,7 +5,7 @@
 #
 # VidCutter - media cutter & joiner
 #
-# copyright © 2017 Pete Alexandrou
+# copyright © 2018 Pete Alexandrou
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,7 +22,6 @@
 #
 #######################################################################
 
-import atexit
 import logging
 import logging.handlers
 import os
@@ -33,7 +32,7 @@ import traceback
 
 from PyQt5.QtCore import (pyqtSlot, QCommandLineOption, QCommandLineParser, QCoreApplication, QDir, QFileInfo,
                           QProcess, QSettings, QSize, QStandardPaths, QTimerEvent, Qt)
-from PyQt5.QtGui import QCloseEvent, QContextMenuEvent, QDragEnterEvent, QDropEvent, QMouseEvent, QResizeEvent
+from PyQt5.QtGui import QCloseEvent, QContextMenuEvent, QDragEnterEvent, QDropEvent, QMouseEvent, QPixmap, QResizeEvent
 from PyQt5.QtWidgets import qApp, QApplication, QMainWindow, QMessageBox, QSizePolicy
 
 from vidcutter.libs.singleapplication import SingleApplication
@@ -41,6 +40,12 @@ from vidcutter.videoconsole import ConsoleHandler, ConsoleWidget, VideoLogger
 from vidcutter.videocutter import VideoCutter
 
 import vidcutter
+import vidcutter.libs.mpv as mpv
+
+if sys.platform == 'win32':
+    from vidcutter.libs.taskbarprogress import TaskbarProgress
+    # noinspection PyUnresolvedReferences
+    from PyQt5.QtWinExtras import QWinTaskbarButton
 
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 signal.signal(signal.SIGTERM, signal.SIG_DFL)
@@ -53,7 +58,7 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super(MainWindow, self).__init__()
-        self.video, self.devmode, self.resizeTimer = '', False, 0
+        self.video, self.resizeTimer = '', 0
         self.parse_cmdline()
         self.init_settings()
         self.init_logger()
@@ -65,9 +70,12 @@ class MainWindow(QMainWindow):
         self.statusBar().setStyleSheet('border: none; padding: 0; margin: 0;')
         self.setAcceptDrops(True)
         self.show()
+        if sys.platform == 'win32' and TaskbarProgress.isValidWinVer():
+            self.win_taskbar_button = QWinTaskbarButton(self)
+            self.win_taskbar_button.setWindow(self.windowHandle())
+            self.win_taskbar_button.progress().setVisible(True)
+            self.win_taskbar_button.progress().setValue(0)
         self.console.setGeometry(int(self.x() - (self.width() / 2)), self.y() + int(self.height() / 3), 750, 300)
-        if not os.path.isdir(MainWindow.WORKING_FOLDER):
-            os.mkdir(MainWindow.WORKING_FOLDER)
         if not self.video and os.path.isfile(os.path.join(QDir.tempPath(), MainWindow.TEMP_PROJECT_FILE)):
             self.video = os.path.join(QDir.tempPath(), MainWindow.TEMP_PROJECT_FILE)
         if self.video:
@@ -105,14 +113,15 @@ class MainWindow(QMainWindow):
 
     def init_logger(self) -> None:
         try:
-            log_path = QStandardPaths.writableLocation(QStandardPaths.AppConfigLocation).lower()
+            log_path = QStandardPaths.writableLocation(QStandardPaths.AppConfigLocation).replace(
+                qApp.applicationName(), qApp.applicationName().lower())
         except AttributeError:
             if sys.platform == 'win32':
                 log_path = os.path.join(QDir.homePath(), 'AppData', 'Local', qApp.applicationName().lower())
             elif sys.platform == 'darwin':
-                log_path = os.path.join(QDir.homePath(), 'Library', 'Preferences', qApp.applicationName()).lower()
+                log_path = os.path.join(QDir.homePath(), 'Library', 'Preferences', qApp.applicationName().lower())
             else:
-                log_path = os.path.join(QDir.homePath(), '.config', qApp.applicationName()).lower()
+                log_path = os.path.join(QDir.homePath(), '.config', qApp.applicationName().lower())
         os.makedirs(log_path, exist_ok=True)
         self.console = ConsoleWidget(self)
         self.consoleLogger = ConsoleHandler(self.console)
@@ -133,15 +142,16 @@ class MainWindow(QMainWindow):
 
     def init_settings(self) -> None:
         try:
-            settings_path = QStandardPaths.writableLocation(QStandardPaths.AppConfigLocation).lower()
+            settings_path = QStandardPaths.writableLocation(QStandardPaths.AppConfigLocation).replace(
+                qApp.applicationName(), qApp.applicationName().lower())
         except AttributeError:
             if sys.platform == 'win32':
                 settings_path = os.path.join(QDir.homePath(), 'AppData', 'Local', qApp.applicationName().lower())
             elif sys.platform == 'darwin':
                 settings_path = os.path.join(QDir.homePath(), 'Library', 'Preferences',
-                                             qApp.applicationName()).lower()
+                                             qApp.applicationName().lower())
             else:
-                settings_path = os.path.join(QDir.homePath(), '.config', qApp.applicationName()).lower()
+                settings_path = os.path.join(QDir.homePath(), '.config', qApp.applicationName().lower())
         os.makedirs(settings_path, exist_ok=True)
         settings_file = '%s.ini' % qApp.applicationName().lower()
         self.settings = QSettings(os.path.join(settings_path, settings_file), QSettings.IniFormat)
@@ -160,29 +170,20 @@ class MainWindow(QMainWindow):
 
     def parse_cmdline(self) -> None:
         self.parser = QCommandLineParser()
-        self.parser.setApplicationDescription('\nVidCutter - the simplest + fastest video cutter & joiner')
+        self.parser.setApplicationDescription('\nVidCutter - the simplest + fastest media cutter & joiner')
         self.parser.addPositionalArgument('video', 'Preload video file', '[video]')
         self.parser.addPositionalArgument('project', 'Open VidCutter project file (.vcp)', '[project]')
         self.debug_option = QCommandLineOption(['debug'], 'debug mode; verbose console output & logging. '
                                                'This will basically output what is being logged to file to the '
                                                'console stdout. Mainly useful for debugging problems with your '
                                                'system video and/or audio stack and codec configuration.')
-        self.dev_option = QCommandLineOption(['dev'], 'developer mode; disables the use of compiled resource files '
-                                             'so that all app resources & assets are accessed directly from the file '
-                                             'system allowing you to see UI changes immediately. this typically '
-                                             'relates to changes made to Qt stylesheets (.qss), layout/templates, '
-                                             'content includes and images. basically all assets defined in .qrc '
-                                             'files throughout the codebase.')
         self.parser.addOption(self.debug_option)
-        self.parser.addOption(self.dev_option)
         self.parser.addVersionOption()
         self.parser.addHelpOption()
         self.parser.process(qApp)
         self.args = self.parser.positionalArguments()
         if self.parser.isSet(self.debug_option):
             os.environ['DEBUG'] = '1'
-        if self.parser.isSet(self.dev_option):
-            self.devmode = True
         if len(self.args) > 0:
             file_path = QFileInfo(self.args[0]).absoluteFilePath()
             if not os.path.exists(file_path):
@@ -218,10 +219,10 @@ class MainWindow(QMainWindow):
     @staticmethod
     def get_path(path: str=None, override: bool=False) -> str:
         if override:
-            if getattr(sys, 'frozen', False):
+            if getattr(sys, 'frozen', False) and getattr(sys, '_MEIPASS', False):
                 # noinspection PyProtectedMember, PyUnresolvedReferences
                 return os.path.join(sys._MEIPASS, path)
-            return os.path.join(QFileInfo(__file__).absolutePath(), path)
+            return os.path.join(os.path.dirname(os.path.realpath(sys.argv[0])), path)
         return ':%s' % path
 
     @pyqtSlot(str)
@@ -231,6 +232,7 @@ class MainWindow(QMainWindow):
         logging.error(msg)
 
     @staticmethod
+    @pyqtSlot()
     def cleanup():
         shutil.rmtree(MainWindow.WORKING_FOLDER, ignore_errors=True)
 
@@ -248,9 +250,10 @@ class MainWindow(QMainWindow):
             # noinspection PyBroadException
             try:
                 if hasattr(self.cutter, 'notify'):
-                    self.cutter.notify.fadeOut()
+                    self.cutter.notify.close()
             except BaseException:
                 pass
+            event.accept()
 
     def dragEnterEvent(self, event: QDragEnterEvent) -> None:
         if event.mimeData().hasUrls():
@@ -301,6 +304,7 @@ class MainWindow(QMainWindow):
                         </tr>
                     </table>'''.format('#C681D5' if self.theme == 'dark' else '#642C68')
                 exitwarn = QMessageBox(QMessageBox.Warning, 'Warning', warntext, parent=self)
+                exitwarn.setIconPixmap(QPixmap(':images/warning.png'))
                 exitwarn.addButton('Yes', QMessageBox.NoRole)
                 cancelbutton = exitwarn.addButton('No', QMessageBox.RejectRole)
                 exitwarn.exec_()
@@ -326,6 +330,7 @@ class MainWindow(QMainWindow):
                         </tr>
                     </table>'''.format('#C681D5' if self.theme == 'dark' else '#642C68')
                 savewarn = QMessageBox(QMessageBox.Warning, 'Warning', warntext, parent=self)
+                savewarn.setIconPixmap(QPixmap(':images/warning.png'))
                 savebutton = savewarn.addButton('Save project', QMessageBox.YesRole)
                 savewarn.addButton('Do not save', QMessageBox.NoRole)
                 cancelbutton = savewarn.addButton('Cancel', QMessageBox.RejectRole)
@@ -354,7 +359,10 @@ class MainWindow(QMainWindow):
                     self.cutter.mpvWidget.shutdown()
             except AttributeError:
                 pass
-        qApp.quit()
+        try:
+            qApp.quit()
+        except mpv.MPVError:
+            pass
 
 
 def main():
@@ -368,8 +376,6 @@ def main():
     if sys.platform == 'darwin':
         QApplication.setStyle('Fusion')
 
-    atexit.register(MainWindow.cleanup)
-
     app = SingleApplication(vidcutter.__appid__, sys.argv)
     app.setApplicationName(vidcutter.__appname__)
     app.setApplicationVersion(vidcutter.__version__)
@@ -379,16 +385,14 @@ def main():
     win = MainWindow()
     app.setActivationWindow(win)
     app.messageReceived.connect(win.file_opener)
+    app.aboutToQuit.connect(MainWindow.cleanup)
 
     exit_code = app.exec_()
     if exit_code == MainWindow.EXIT_CODE_REBOOT:
-        if sys.platform == 'win32':
-            if hasattr(win.cutter, 'mpvWidget'):
-                win.close()
-            QProcess.startDetached('"{}"'.format(qApp.applicationFilePath()))
-        else:
-            os.execl(sys.executable, sys.executable, *sys.argv)
-    sys.exit(exit_code)
+        if QProcess.startDetached(' '.join(sys.argv)):
+            sys.exit(exit_code)
+    else:
+        sys.exit(exit_code)
 
 
 if __name__ == '__main__':

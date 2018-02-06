@@ -2,6 +2,10 @@
     <qresource prefix="/">
         <file>fonts/FuturaLT.ttf</file>
         <file>fonts/NotoSans.ttc</file>
+        <file>images/arrow-left.png</file>
+        <file>images/arrow-left-on.png</file>
+        <file>images/arrow-right.png</file>
+        <file>images/arrow-right-on.png</file>
         <file>images/complete-play.png</file>
         <file>images/dialog-backdrop.png</file>
         <file>images/dialog-backdrop-02.png</file>
@@ -10,6 +14,7 @@
         <file>images/filmstrip.png</file>
         <file>images/filmstrip-thumbs.png</file>
         <file>images/filmstrip-nothumbs.png</file>
+        <file>images/folder.png</file>
         <file>images/generating-thumbs.png</file>
         <file>images/handle.png</file>
         <file>images/handle-select.png</file>
@@ -17,8 +22,6 @@
         <file>images/handle-nothumbs-select.png</file>
         <file>images/info.png</file>
         <file>images/keymap.png</file>
-        <file>images/mpv.png</file>
-        <file>images/novideotext.gif</file>
         <file>images/open.png</file>
         <file>images/pycharm.png</file>
         <file>images/qt.png</file>
@@ -28,21 +31,29 @@
         <file>images/runtime.png</file>
         <file>images/save.png</file>
         <file>images/settings.png</file>
+        <file>images/settings-ffmpeg.png</file>
         <file>images/settings-general.png</file>
         <file>images/settings-logs.png</file>
         <file>images/settings-theme.png</file>
         <file>images/settings-video.png</file>
         <file>images/slider-knob.png</file>
         <file>images/slider-knob-active.png</file>
-        <file>images/startup-backdrop.png</file>
+        <file>images/startup-backdrop.jpg</file>
+        <file>images/streams.png</file>
+        <file>images/theme-dark.png</file>
+        <file>images/theme-light.png</file>
         <file>images/up.png</file>
         <file>images/update.png</file>
         <file>images/vidcutter.png</file>
         <file>images/vidcutter-small.png</file>
         <file>images/viewlogs.png</file>
+        <file>images/warning.png</file>
         <file>images/watermark.png</file>
         <file>images/dark/about-background.png</file>
         <file>images/dark/background_complete.png</file>
+        <file>images/dark/checkbox.png</file>
+        <file>images/dark/checkbox-hover.png</file>
+        <file>images/dark/checkbox-checked.png</file>
         <file>images/dark/clipindex.png</file>
         <file>images/dark/clipindex-add.png</file>
         <file>images/dark/clipindex-add-disabled.png</file>
@@ -69,6 +80,9 @@
         <file>images/dark/osd-off.png</file>
         <file>images/dark/osd-on.png</file>
         <file>images/dark/python.png</file>
+        <file>images/dark/radio.png</file>
+        <file>images/dark/radio-checked.png</file>
+        <file>images/dark/radio-hover.png</file>
         <file>images/dark/settings.png</file>
         <file>images/dark/settings-active.png</file>
         <file>images/dark/settings-disabled.png</file>
@@ -78,33 +92,47 @@
         <file>images/dark/smartcut-hover.png</file>
         <file>images/dark/smartcut-off.png</file>
         <file>images/dark/smartcut-on.png</file>
-        <file>images/dark/theme-dark.png</file>
-        <file>images/dark/theme-light.png</file>
+        <file>images/dark/streams.png</file>
+        <file>images/dark/streams-active.png</file>
+        <file>images/dark/streams-audio.png</file>
+        <file>images/dark/streams-disabled.png</file>
+        <file>images/dark/streams-hover.png</file>
+        <file>images/dark/streams-subtitle.png</file>
+        <file>images/dark/streams-video.png</file>
         <file>images/dark/thumbnails-disabled.png</file>
         <file>images/dark/thumbnails-hover.png</file>
         <file>images/dark/thumbnails-off.png</file>
         <file>images/dark/thumbnails-on.png</file>
         <file>images/dark/toolbar-end.png</file>
         <file>images/dark/toolbar-end-disabled.png</file>
-        <file>images/dark/toolbar-end-on.png</file>
+        <file>images/dark/toolbar-end-hover.png</file>
+        <file>images/dark/toolbar-end-pressed.png</file>
         <file>images/dark/toolbar-open.png</file>
         <file>images/dark/toolbar-open-disabled.png</file>
-        <file>images/dark/toolbar-open-on.png</file>
+        <file>images/dark/toolbar-open-hover.png</file>
+        <file>images/dark/toolbar-open-pressed.png</file>
         <file>images/dark/toolbar-pause.png</file>
         <file>images/dark/toolbar-pause-disabled.png</file>
-        <file>images/dark/toolbar-pause-on.png</file>
+        <file>images/dark/toolbar-pause-hover.png</file>
+        <file>images/dark/toolbar-pause-pressed.png</file>
         <file>images/dark/toolbar-play.png</file>
         <file>images/dark/toolbar-play-disabled.png</file>
-        <file>images/dark/toolbar-play-on.png</file>
+        <file>images/dark/toolbar-play-hover.png</file>
+        <file>images/dark/toolbar-play-pressed.png</file>
         <file>images/dark/toolbar-save.png</file>
         <file>images/dark/toolbar-save-disabled.png</file>
-        <file>images/dark/toolbar-save-on.png</file>
+        <file>images/dark/toolbar-save-hover.png</file>
+        <file>images/dark/toolbar-save-pressed.png</file>
         <file>images/dark/toolbar-start.png</file>
         <file>images/dark/toolbar-start-disabled.png</file>
-        <file>images/dark/toolbar-start-on.png</file>
+        <file>images/dark/toolbar-start-hover.png</file>
+        <file>images/dark/toolbar-start-pressed.png</file>
         <file>images/dark/unmuted.png</file>
         <file>images/light/about-background.png</file>
         <file>images/light/background_complete.png</file>
+        <file>images/light/checkbox.png</file>
+        <file>images/light/checkbox-hover.png</file>
+        <file>images/light/checkbox-checked.png</file>
         <file>images/light/clipindex.png</file>
         <file>images/light/clipindex-add.png</file>
         <file>images/light/clipindex-add-disabled.png</file>
@@ -131,6 +159,9 @@
         <file>images/light/osd-off.png</file>
         <file>images/light/osd-on.png</file>
         <file>images/light/python.png</file>
+        <file>images/light/radio.png</file>
+        <file>images/light/radio-checked.png</file>
+        <file>images/light/radio-hover.png</file>
         <file>images/light/settings.png</file>
         <file>images/light/settings-active.png</file>
         <file>images/light/settings-disabled.png</file>
@@ -140,30 +171,41 @@
         <file>images/light/smartcut-hover.png</file>
         <file>images/light/smartcut-off.png</file>
         <file>images/light/smartcut-on.png</file>
-        <file>images/light/theme-dark.png</file>
-        <file>images/light/theme-light.png</file>
+        <file>images/light/streams.png</file>
+        <file>images/light/streams-active.png</file>
+        <file>images/light/streams-audio.png</file>
+        <file>images/light/streams-disabled.png</file>
+        <file>images/light/streams-hover.png</file>
+        <file>images/light/streams-subtitle.png</file>
+        <file>images/light/streams-video.png</file>
         <file>images/light/thumbnails-disabled.png</file>
         <file>images/light/thumbnails-hover.png</file>
         <file>images/light/thumbnails-off.png</file>
         <file>images/light/thumbnails-on.png</file>
         <file>images/light/toolbar-end.png</file>
         <file>images/light/toolbar-end-disabled.png</file>
-        <file>images/light/toolbar-end-on.png</file>
+        <file>images/light/toolbar-end-hover.png</file>
+        <file>images/light/toolbar-end-pressed.png</file>
         <file>images/light/toolbar-open.png</file>
         <file>images/light/toolbar-open-disabled.png</file>
-        <file>images/light/toolbar-open-on.png</file>
+        <file>images/light/toolbar-open-hover.png</file>
+        <file>images/light/toolbar-open-pressed.png</file>
         <file>images/light/toolbar-pause.png</file>
         <file>images/light/toolbar-pause-disabled.png</file>
-        <file>images/light/toolbar-pause-on.png</file>
+        <file>images/light/toolbar-pause-hover.png</file>
+        <file>images/light/toolbar-pause-pressed.png</file>
         <file>images/light/toolbar-play.png</file>
         <file>images/light/toolbar-play-disabled.png</file>
-        <file>images/light/toolbar-play-on.png</file>
+        <file>images/light/toolbar-play-hover.png</file>
+        <file>images/light/toolbar-play-pressed.png</file>
         <file>images/light/toolbar-save.png</file>
         <file>images/light/toolbar-save-disabled.png</file>
-        <file>images/light/toolbar-save-on.png</file>
+        <file>images/light/toolbar-save-hover.png</file>
+        <file>images/light/toolbar-save-pressed.png</file>
         <file>images/light/toolbar-start.png</file>
         <file>images/light/toolbar-start-disabled.png</file>
-        <file>images/light/toolbar-start-on.png</file>
+        <file>images/light/toolbar-start-hover.png</file>
+        <file>images/light/toolbar-start-pressed.png</file>
         <file>images/light/unmuted.png</file>
         <file>styles/light.qss</file>
         <file>styles/dark.qss</file>

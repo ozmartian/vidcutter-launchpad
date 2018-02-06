@@ -5,7 +5,7 @@
 #
 # VidCutter - media cutter & joiner
 #
-# copyright © 2017 Pete Alexandrou
+# copyright © 2018 Pete Alexandrou
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,18 +25,66 @@
 import os
 import sys
 
-from PyQt5.QtCore import pyqtSignal, pyqtSlot, QEvent, QObject, QPoint, Qt, QTime, QTimer
+from PyQt5.QtCore import (pyqtProperty, pyqtSignal, pyqtSlot, QEasingCurve, QEvent, QObject, QPoint, QPropertyAnimation,
+                          QSize, Qt, QTime, QTimer)
 from PyQt5.QtGui import QShowEvent
-from PyQt5.QtWidgets import (qApp, QAbstractSpinBox, QDialog, QDialogButtonBox, QGridLayout, QHBoxLayout, QLabel,
-                             QMessageBox, QProgressBar, QSlider, QSpinBox, QStyle, QStyleFactory,
-                             QStyleOptionSlider, QTimeEdit, QToolBox, QToolTip, QVBoxLayout, QWidget)
+from PyQt5.QtWidgets import (qApp, QAbstractSpinBox, QDialog, QDialogButtonBox, QGraphicsOpacityEffect, QGridLayout,
+                             QHBoxLayout, QLabel, QMessageBox, QProgressBar, QPushButton, QSlider, QSpinBox, QStyle,
+                             QStyleFactory, QStyleOptionSlider, QTimeEdit, QToolBox, QToolTip, QVBoxLayout, QWidget)
 
 
-class TimeCounter(QWidget):
+class VCToolBarButton(QWidget):
+    clicked = pyqtSignal(bool)
+
+    def __init__(self, label: str, statustip: str, labelstyle: str='beside', parent=None):
+        super(VCToolBarButton, self).__init__(parent)
+        self.setFocusPolicy(Qt.NoFocus)
+        self.button = QPushButton(parent)
+        self.button.setCursor(Qt.PointingHandCursor)
+        self.button.setFlat(True)
+        self.button.setFixedSize(QSize(50, 53))
+        self.button.installEventFilter(self)
+        self.button.clicked.connect(self.clicked)
+        self.setup(label, statustip)
+        self.label1 = QLabel(label.replace(' ', '<br/>'), self)
+        self.label2 = QLabel(label, self)
+        layout = QGridLayout()
+        layout.setSpacing(5)
+        layout.addWidget(self.button, 0, 0, Qt.AlignHCenter)
+        layout.addWidget(self.label1, 0, 1)
+        layout.addWidget(self.label2, 1, 0)
+        self.setLayout(layout)
+        self.setLabelStyle(labelstyle)
+
+    def setup(self, label: str, statustip: str, reset: bool=False) -> None:
+        self.button.setToolTip(label)
+        self.button.setStatusTip(statustip)
+        self.button.setObjectName('toolbar-{}'.format(label.split()[0].lower()))
+        if reset:
+            self.button.setStyleSheet('')
+
+    def setLabelStyle(self, labelstyle: str) -> None:
+        if labelstyle == 'under':
+            self.label1.setVisible(False)
+            self.label2.setVisible(True)
+        elif labelstyle == 'none':
+            self.label1.setVisible(False)
+            self.label2.setVisible(False)
+        else:
+            self.label1.setVisible(True)
+            self.label2.setVisible(False)
+
+    def eventFilter(self, obj: QObject, event: QEvent) -> bool:
+        if event.type() in {QEvent.ToolTip, QEvent.StatusTip} and not self.isEnabled():
+            return True
+        return super(VCToolBarButton, self).eventFilter(obj, event)
+
+
+class VCTimeCounter(QWidget):
     timeChanged = pyqtSignal(QTime)
 
     def __init__(self, parent=None):
-        super(TimeCounter, self).__init__(parent)
+        super(VCTimeCounter, self).__init__(parent)
         self.parent = parent
         self.timeedit = QTimeEdit(QTime(0, 0))
         self.timeedit.setObjectName('timeCounter')
@@ -50,6 +98,7 @@ class TimeCounter(QWidget):
         self.duration.setObjectName('timeDuration')
         layout = QHBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(5)
         layout.addWidget(self.timeedit)
         layout.addWidget(separator)
         layout.addWidget(self.duration)
@@ -81,7 +130,7 @@ class TimeCounter(QWidget):
     def hasFocus(self) -> bool:
         if self.timeedit.hasFocus():
             return True
-        return super(TimeCounter, self).hasFocus()
+        return super(VCTimeCounter, self).hasFocus()
 
     def reset(self) -> None:
         self.timeedit.setTime(QTime(0, 0))
@@ -100,11 +149,11 @@ class TimeCounter(QWidget):
             self.timeChanged.emit(newtime)
 
 
-class FrameCounter(QWidget):
+class VCFrameCounter(QWidget):
     frameChanged = pyqtSignal(int)
 
     def __init__(self, parent=None):
-        super(FrameCounter, self).__init__(parent)
+        super(VCFrameCounter, self).__init__(parent)
         self.parent = parent
         self.currentframe = QSpinBox(self)
         self.currentframe.setObjectName('frameCounter')
@@ -142,7 +191,7 @@ class FrameCounter(QWidget):
     def hasFocus(self) -> bool:
         if self.currentframe.hasFocus():
             return True
-        return super(FrameCounter, self).hasFocus()
+        return super(VCFrameCounter, self).hasFocus()
 
     def clearFocus(self) -> None:
         self.currentframe.clearFocus()
@@ -268,10 +317,11 @@ class VCProgressBar(QDialog):
         super(VCProgressBar, self).close()
 
 
-class VolumeSlider(QSlider):
+class VCVolumeSlider(QSlider):
     def __init__(self, parent=None, **kwargs):
-        super(VolumeSlider, self).__init__(parent, **kwargs)
+        super(VCVolumeSlider, self).__init__(parent, **kwargs)
         self.setObjectName('volumeslider')
+        self.setFocusPolicy(Qt.NoFocus)
         self.valueChanged.connect(self.showTooltip)
         self.offset = QPoint(0, -45)
         if sys.platform == 'win32':
@@ -286,6 +336,31 @@ class VolumeSlider(QSlider):
         pos += self.offset
         globalPos = self.mapToGlobal(pos)
         QToolTip.showText(globalPos, str('{0}%'.format(value)), self)
+
+
+class VCBlinkText(QWidget):
+    def __init__(self, text: str, parent=None):
+        super(VCBlinkText, self).__init__(parent)
+        self.label = QLabel(text)
+        self.label.setMinimumHeight(self.label.sizeHint().height() + 20)
+        layout = QHBoxLayout(self)
+        layout.addWidget(self.label)
+        self.effect = QGraphicsOpacityEffect(self.label)
+        self.label.setGraphicsEffect(self.effect)
+        self.anim = QPropertyAnimation(self.effect, b'opacity')
+        self.anim.setDuration(3500)
+        self.anim.setLoopCount(-1)
+        self.anim.setStartValue(1.0)
+        self.anim.setKeyValueAt(0.5, 0.0)
+        self.anim.setEndValue(1.0)
+        self.anim.setEasingCurve(QEasingCurve.OutQuad)
+        self.anim.start(QPropertyAnimation.DeleteWhenStopped)
+
+    def setAlignment(self, alignment: Qt.AlignmentFlag) -> None:
+        self.label.setAlignment(alignment)
+
+    def stop(self) -> None:
+        self.anim.stop()
 
 
 class ClipErrorsDialog(QDialog):
@@ -339,16 +414,16 @@ class ClipErrorsDialog(QDialog):
     def intro(self) -> QLabel:
         return QLabel('''
             <style>
-                h1 {
+                h1 {{
                     text-align: center;
                     color: {0};
                     font-family: "Futura-Light", sans-serif;
                     font-weight: 400;
-                }
-                p {
+                }}
+                p {{
                     font-family: "Noto Sans UI", sans-serif;
                     color: {1};
-                }
+                }}
             </style>
             <h1>Invalid media files detected</h1>
             <p>

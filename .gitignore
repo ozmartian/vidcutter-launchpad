@@ -3,6 +3,7 @@ __pycache__
 .directory
 .vscode
 .vs
+.old
 build
 dist
 vidcutter.egg*
@@ -18,7 +19,6 @@ vidcutter/vidcutter.exe
 vidcutter/bin/
 bin/
 .DS_Store
-_packaging/appimage/*/
 _packaging/pyqtdeploy/
 _pyqtdeploy
 testing
@@ -31,3 +31,4 @@ MediaInfo.dll
 *.so
 *.pyd
 *.pyc
+pkg2appimage

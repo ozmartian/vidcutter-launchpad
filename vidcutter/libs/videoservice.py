@@ -5,7 +5,7 @@
 #
 # VidCutter - media cutter & joiner
 #
-# copyright © 2017 Pete Alexandrou
+# copyright © 2018 Pete Alexandrou
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -29,17 +29,16 @@ import re
 import shlex
 import sys
 from bisect import bisect_left
-from distutils.spawn import find_executable
 from enum import Enum
 from functools import partial
 
-from PyQt5.QtCore import (pyqtSignal, pyqtSlot, QDir, QFile, QFileInfo, QObject, QProcess, QProcessEnvironment, QSize,
-                          QStorageInfo, QTemporaryFile, QTime)
+from PyQt5.QtCore import (pyqtSignal, pyqtSlot, QDir, QFile, QFileInfo, QObject, QProcess, QProcessEnvironment,
+                          QSettings, QSize, QStandardPaths, QStorageInfo, QTemporaryFile, QTime)
 from PyQt5.QtGui import QPainter, QPixmap
 from PyQt5.QtWidgets import QMessageBox
 
+from vidcutter.libs.config import Config, InvalidMediaException, Streams, ToolNotFoundException
 from vidcutter.libs.munch import Munch
-from vidcutter.libs.videoconfig import FFmpegNotFoundException, InvalidMediaException, VideoConfig
 
 try:
     # noinspection PyPackageRequirements
@@ -62,19 +61,15 @@ class VideoService(QObject):
         INDEX = QSize(100, 70)
         TIMELINE = QSize(105, 60)
 
-    class Stream(Enum):
-        AUDIO = 0
-        VIDEO = 1
-        SUBTITLE = 2
+    config = Config()
 
-    config = VideoConfig()
-
-    def __init__(self, parent=None):
+    def __init__(self, settings: QSettings, parent=None):
         super(VideoService, self).__init__(parent)
+        self.settings = settings
         self.parent = parent
         self.logger = logging.getLogger(__name__)
         try:
-            self.backends = VideoService.findBackends()
+            self.backends = VideoService.findBackends(self.settings)
             self.proc = VideoService.initProc()
             if hasattr(self.proc, 'errorOccurred'):
                 self.proc.errorOccurred.connect(self.cmdError)
@@ -82,7 +77,8 @@ class VideoService(QObject):
             self.media, self.source = None, None
             self.keyframes = []
             self.streams = Munch()
-        except FFmpegNotFoundException as e:
+            self.mappings = []
+        except ToolNotFoundException as e:
             self.logger.exception(e.msg, exc_info=True)
             QMessageBox.critical(getattr(self, 'parent', None), 'Missing libraries', e.msg, QMessageBox.Ok)
 
@@ -93,13 +89,16 @@ class VideoService(QObject):
             if self.media is not None:
                 if getattr(self.parent, 'verboseLogs', False):
                     self.logger.info(self.media)
-                for codec_type in VideoService.Stream.__members__:
+                for codec_type in Streams.__members__:
                     setattr(self.streams, codec_type.lower(),
                             [stream for stream in self.media.streams if stream.codec_type == codec_type.lower()])
                 if len(self.streams.video):
                     self.streams.video = self.streams.video[0]  # we always assume one video stream per media file
                 else:
                     raise InvalidMediaException('Could not load video stream for {}'.format(source))
+                self.mappings.clear()
+                # noinspection PyUnusedLocal
+                [self.mappings.append(True) for i in range(int(self.media.format.nb_streams))]
         except OSError as e:
             if e.errno == errno.ENOENT:
                 errormsg = '{0}: {1}'.format(os.strerror(errno.ENOENT), source)
@@ -107,21 +106,34 @@ class VideoService(QObject):
                 raise FileNotFoundError(errormsg)
 
     @staticmethod
-    def findBackends() -> Munch:
+    def findBackends(settings: QSettings) -> Munch:
         tools = Munch(ffmpeg=None, ffprobe=None, mediainfo=None)
-        for backend in tools.keys():
-            for exe in VideoService.config.binaries[os.name][backend]:
-                binpath = QDir.toNativeSeparators('{0}/bin/{1}'.format(VideoService.getAppPath(), exe))
-                if binpath is not None and os.path.isfile(binpath):
-                    tools[backend] = binpath
-                    break
-                else:
-                    binpath = find_executable(exe)
-                    if binpath is not None and os.path.isfile(binpath):
-                        tools[backend] = binpath
+        settings.beginGroup('tools')
+        tools.ffmpeg = settings.value('ffmpeg', None, type=str)
+        tools.ffprobe = settings.value('ffprobe', None, type=str)
+        tools.mediainfo = settings.value('mediainfo', None, type=str)
+        for tool in list(tools.keys()):
+            path = tools[tool]
+            if path is None or not len(path):
+                for exe in VideoService.config.binaries[os.name][tool]:
+                    if VideoService.frozen:
+                        binpath = os.path.join(VideoService.getAppPath(), 'bin', exe)
+                    else:
+                        binpath = QStandardPaths.findExecutable(exe)
+                        if not len(binpath):
+                            binpath = QStandardPaths.findExecutable(exe, [os.path.join(VideoService.getAppPath(), 'bin')])
+                    if os.path.isfile(binpath) and os.access(binpath, os.X_OK):
+                        tools[tool] = binpath
+                        if not VideoService.frozen:
+                            settings.setValue(tool, binpath)
                         break
+        settings.endGroup()
         if tools.ffmpeg is None:
-            raise FFmpegNotFoundException('Could not locate any ffmpeg or libav executable on your operating system')
+            raise ToolNotFoundException('Could not locate ffmpeg on system')
+        if tools.ffprobe is None:
+            raise ToolNotFoundException('Could not locate ffprobe onsystem')
+        if tools.mediainfo is None:
+            raise ToolNotFoundException('Could not locate mediainfo on system')
         return tools
 
     @staticmethod
@@ -151,14 +163,14 @@ class VideoService(QObject):
             self.spaceWarningDelivered = True
 
     @staticmethod
-    def captureFrame(source: str, frametime: str, thumbsize: QSize=ThumbSize.INDEX.value,
+    def captureFrame(settings: QSettings, source: str, frametime: str, thumbsize: QSize=ThumbSize.INDEX.value,
                      external: bool=False) -> QPixmap:
         # print('[captureFrame] frametime: {0}  thumbsize: {1}'.format(frametime, thumbsize))
         capres = QPixmap()
         img = QTemporaryFile(os.path.join(QDir.tempPath(), 'XXXXXX.jpg'))
         if img.open():
             imagecap = img.fileName()
-            cmd = VideoService.findBackends().ffmpeg
+            cmd = VideoService.findBackends(settings).ffmpeg
             args = '-hide_banner -ss {0} -i "{1}" -vframes 1 -s {2:d}x{3:d} -y "{4}"' \
                    .format(frametime, source, thumbsize.width(), thumbsize.height(), imagecap)
             proc = VideoService.initProc()
@@ -254,10 +266,22 @@ class VideoService(QObject):
             acodec = re.search(r'Stream.*Audio:\s(\w+)', result).group(1)
             return vcodec, acodec
 
+    def parseMappings(self, allstreams: bool=True) -> str:
+        if not len(self.mappings) or (self.parent is not None and self.parent.hasExternals()):
+            return '-map 0 ' if allstreams else ''
+        # if False not in self.mappings:
+        #     return '-map 0 '
+        output = ''
+        for stream_id in range(len(self.mappings)):
+            if self.mappings[stream_id]:
+                output += '-map 0:{} '.format(stream_id)
+        return output
+
     def cut(self, source: str, output: str, frametime: str, duration: str, allstreams: bool=True, vcodec: str=None,
             run: bool=True):
         self.checkDiskSpace(output)
-        stream_map = '-map 0 ' if allstreams else ''
+        source = QDir.toNativeSeparators(source)
+        stream_map = self.parseMappings(allstreams)
         if vcodec is not None:
             encode_options = VideoService.config.encoding.get(vcodec, vcodec)
             args = '-v 32 -i "{}" -ss {} -t {} -c:v {} -c:a copy -c:s copy {}-avoid_negative_ts 1 ' \
@@ -265,6 +289,8 @@ class VideoService(QObject):
         else:
             args = '-v error -ss {} -t {} -i "{}" -c copy {}-avoid_negative_ts 1 -copyinkf -y "{}"' \
                    .format(frametime, duration, source, stream_map, output)
+        # print(self.mappings)
+        # print(args)
         if run:
             result = self.cmdExec(self.backends.ffmpeg, args)
             if not result or os.path.getsize(output) < 1000:
@@ -291,6 +317,7 @@ class VideoService(QObject):
         ]
 
     def smartcut(self, index: int, source: str, output: str, start: float, end: float, allstreams: bool=True) -> None:
+        source = QDir.toNativeSeparators(source)
         output_file, output_ext = os.path.splitext(output)
         bisections = self.getGOPbisections(source, start, end)
         self.smartcut_jobs[index].output = output
@@ -349,7 +376,6 @@ class VideoService(QObject):
                          run=False)))
             self.smartcut_jobs[index].procs.update(end=endproc)
             self.smartcut_jobs[index].results.update(end=False)
-            # endproc.start()
 
     @pyqtSlot(int, QProcess.ExitStatus)
     def smartcheck(self, code: int, status: QProcess.ExitStatus) -> None:
@@ -556,7 +582,7 @@ class VideoService(QObject):
 
     def cmdExec(self, cmd: str, args: str=None, output: bool=False, suppresslog: bool=False):
         if self.proc.state() == QProcess.NotRunning:
-            if cmd == self.backends.mediainfo:
+            if cmd in {self.backends.ffprobe, self.backends.mediainfo}:
                 self.proc.setProcessChannelMode(QProcess.SeparateChannels)
             if cmd in {self.backends.ffmpeg, self.backends.ffprobe}:
                 args = '-hide_banner {}'.format(args)
@@ -591,6 +617,6 @@ class VideoService(QObject):
     # noinspection PyUnresolvedReferences, PyProtectedMember
     @staticmethod
     def getAppPath() -> str:
-        if VideoService.frozen:
+        if VideoService.frozen and getattr(sys, '_MEIPASS', False):
             return sys._MEIPASS
-        return QFileInfo(__file__).absolutePath()
+        return os.path.dirname(os.path.realpath(sys.argv[0]))

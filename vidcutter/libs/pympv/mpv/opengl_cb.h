@@ -53,9 +53,10 @@ extern "C" {
  * pointers returned by the get_proc_address callback in mpv_opengl_cb_init_gl.
  * Generally, mpv will not load the system OpenGL library when using this API.
  *
- * Only "desktop" OpenGL version 2.1 or later is supported. With OpenGL 2.1,
- * the GL_ARB_texture_rg is required. The renderer was written against
- * OpenGL 3.x core profile, with additional support for OpenGL 2.1.
+ * Only "desktop" OpenGL version 2.1 and later and OpenGL ES version 2.0 and
+ * later are supported. With OpenGL 2.1, the GL_ARB_texture_rg is required. The
+ * renderer was written for the OpenGL 3.x core profile, with additional support
+ * for OpenGL 2.1 and OpenGL ES 2.0.
  *
  * Note that some hardware decoding interop API (as set with the "hwdec" option)
  * may actually access
@@ -68,14 +69,20 @@ extern "C" {
  * defaults. Likewise, mpv will attempt to leave the OpenGL context with
  * standard defaults. The following state is excluded from this:
  *
- *      - the current viewport (can have/is set to an arbitrary value)
+ *      - the glViewport state
+ *      - the glScissor state (but GL_SCISSOR_TEST is in its default value)
+ *      - glBlendFuncSeparate() state (but GL_BLEND is in its default value)
+ *      - glClearColor() state
+ *      - mpv may overwrite the callback set with glDebugMessageCallback()
+ *      - mpv always disables GL_DITHER at init
  *
  * Messing with the state could be avoided by creating shared OpenGL contexts,
  * but this is avoided for the sake of compatibility and interoperability.
  *
  * On OpenGL 2.1, mpv will strictly call functions like glGenTextures() to
  * create OpenGL objects. You will have to do the same. This ensures that
- * objects created by mpv and the API users don't clash.
+ * objects created by mpv and the API users don't clash. Also, legacy state
+ * must be either in its defaults, or not interfere with core state.
  *
  * Threading
  * ---------
@@ -110,17 +117,18 @@ extern "C" {
  *
  * While "normal" mpv loads the OpenGL hardware decoding interop on demand,
  * this can't be done with opengl_cb for internal technical reasons. Instead,
- * make it load the interop at load time by setting the
- * "opengl-hwdec-interop"="auto" option before calling mpv_opengl_cb_init_gl()
- * ("hwdec-preload" in older mpv releases).
+ * it loads them by default, even if hardware decoding is not going to be used.
+ * In older mpv relases, this had to be done by setting the
+ * "opengl-hwdec-interop" or "hwdec-preload" options before calling
+ * mpv_opengl_cb_init_gl(). You can still use the newer "gpu-hwdec-interop"
+ * option to prevent loading of interop, or to load only a specific interop.
  *
  * There may be certain requirements on the OpenGL implementation:
  * - Windows: ANGLE is required (although in theory GL/DX interop could be used)
  * - Intel/Linux: EGL is required, and also a glMPGetNativeDisplay() callback
  *                must be provided (see sections below)
- * - nVidia/Linux: GLX is required (if you force "cuda", it should work on EGL
- *                 as well, if you have recent enough drivers and the
- *                 "hwaccel" option is set to "cuda" as well)
+ * - nVidia/Linux: Both GLX and EGL should work (GLX is required if vdpau is
+ *                 used, e.g. due to old drivers.)
  * - OSX: CGL is required (CGLGetCurrentContext() returning non-NULL)
  * - iOS: EAGL is required (EAGLContext.currentContext returning non-nil)
  *
@@ -145,6 +153,27 @@ extern "C" {
  * up until mpv_opengl_cb_uninit_gl() is called. If the name is not anything
  * you know/expected, return NULL from the function.
  *
+ * * Windowing system scaling
+ * ------------------------------------
+ *
+ * When using GL, sometimes GL rendering window is upscaled to display buffer.
+ * Typically with drm where GL framebuffer can be upscaled at later stage.
+ * In That case glMPGetNativeDisplay("opengl-cb-window-pos") should return an
+ * mpv_opengl_cb_window_pos struct pointer defined below.
+ * Note : The intended use is for hardware overlays that might require
+ * upscaling features (typically upscaling GL windows with drm to screen size).
+ *
+ * This is never used for GL rendering - only to map hardware overlays to
+ * GL rendering (for backends which support it).
+ */
+struct mpv_opengl_cb_window_pos {
+    int x;      // left coordinates of window (usually 0)
+    int y;      // top coordinates of window (usually 0)
+    int width;  // width of GL window
+    int height; // height of GL window
+};
+
+/**
  * Windowing system interop on Intel/Linux with VAAPI
  * --------------------------------------------------
  *
@@ -157,10 +186,22 @@ extern "C" {
  *
  * glMPGetNativeDisplay("wl") should return a Wayland "struct wl_display *".
  *
- * glMPGetNativeDisplay("drm") should return a DRM FD casted to intptr_t (note
- * that a 0 FD is not supported - if this can happen in your case, you must
- * dup2() it to a non-0 FD).
- *
+ * glMPGetNativeDisplay("opengl-cb-drm-params") should return an
+ * mpv_opengl_cb_drm_params structure pointer :
+ */
+struct mpv_opengl_cb_drm_params {
+    // DRM fd (int). set this to -1 if invalid.
+    int fd;
+
+    // currently used crtc id
+    int crtc_id;
+
+    // pointer to the drmModeAtomicReq that is being used for the renderloop.
+    // This atomic request pointer should be usually created at every renderloop.
+    struct _drmModeAtomicReq *atomic_request;
+};
+
+/**
  * nVidia/Linux via VDPAU requires GLX, which does not have this problem (the
  * GLX API can return the current X11 Display).
  *
@@ -211,7 +252,8 @@ typedef void *(*mpv_opengl_cb_get_proc_address_fn)(void *fn_ctx, const char *nam
  * Set the callback that notifies you when a new video frame is available, or
  * if the video display configuration somehow changed and requires a redraw.
  * Similar to mpv_set_wakeup_callback(), you must not call any mpv API from
- * the callback.
+ * the callback, and all the other listed restrictions apply (such as not
+ * exiting the callback by throwing exceptions).
  *
  * @param callback callback(callback_ctx) is called if the frame should be
  *                 redrawn

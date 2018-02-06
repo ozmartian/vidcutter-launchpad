@@ -5,7 +5,7 @@
 #
 # VidCutter - media cutter & joiner
 #
-# copyright © 2017 Pete Alexandrou
+# copyright © 2018 Pete Alexandrou
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,11 +22,11 @@
 #
 #######################################################################
 
-__version__ = '5.0.5'
+__version__ = '5.5.0'
 
 __appname__ = 'VidCutter'
 __domain__ = 'ozmartians.com'
-__desktopid__ = 'com.ozmartians.VidCutter'
+__desktopid__ = 'com.ozmartians.vidcutter'
 __appid__ = 'vidcutter-CCDC440A-CC57-4BED-8CDE-1DA285976A64'
 
 __author__ = 'Pete Alexandrou'

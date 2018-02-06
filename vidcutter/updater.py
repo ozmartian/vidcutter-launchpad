@@ -5,7 +5,7 @@
 #
 # VidCutter - media cutter & joiner
 #
-# copyright © 2017 Pete Alexandrou
+# copyright © 2018 Pete Alexandrou
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -26,7 +26,6 @@ import json
 import logging
 import os
 import sys
-from pkg_resources import parse_version
 
 from PyQt5.QtCore import Qt, QUrl
 from PyQt5.QtGui import QDesktopServices
@@ -59,8 +58,8 @@ class Updater(QDialog):
         # noinspection PyTypeChecker
         jsonobj = json.loads(str(reply.readAll(), 'utf-8'))
         reply.deleteLater()
-        latest = parse_version(jsonobj.get('tag_name'))
-        current = parse_version(qApp.applicationVersion())
+        latest = jsonobj.get('tag_name')
+        current = qApp.applicationVersion()
         self.mbox.show_result(latest, current)
 
     def check(self) -> None:
@@ -77,12 +76,11 @@ class Updater(QDialog):
 
 
 class UpdaterMsgBox(QDialog):
-    def __init__(self, parent=None, theme: str='light', title: str='Checking for updates',
-                 flags=Qt.Dialog | Qt.WindowCloseButtonHint):
+    def __init__(self, parent=None, theme: str='light', flags=Qt.Dialog | Qt.WindowCloseButtonHint):
         super(UpdaterMsgBox, self).__init__(parent, flags)
         self.parent = parent
         self.theme = theme
-        self.setWindowTitle(title)
+        self.setWindowTitle('{} updates'.format(qApp.applicationName()))
         self.setWindowModality(Qt.ApplicationModal)
         self.setObjectName('updaterdialog')
         self.loading = VCProgressBar(self.parent)
@@ -115,17 +113,18 @@ class UpdaterMsgBox(QDialog):
             }
             table {
                 color: %s;
-                font-size: 15px;
                 margin: 10px 0 0 0;
             }
             td.label {
                 font-family: "Futura-Light", san-serif;
                 text-align: right;
+                font-size: 17px;
             }
             td.value {
                 font-family: "Noto Sans UI", sans-serif;
                 color: %s;
                 font-weight: 500;
+                font-size: 15px;
             }
         </style>''' % (pencolor1, pencolor2, pencolor2, pencolor1)
         if update_available:

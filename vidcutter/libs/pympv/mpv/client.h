@@ -134,6 +134,10 @@ extern "C" {
  * - The FPU precision must be set at least to double precision.
  * - On Windows, mpv will call timeBeginPeriod(1).
  * - On memory exhaustion, mpv will kill the process.
+ * - In certain cases, mpv may start sub processes (such as with the ytdl
+ *   wrapper script).
+ * - Using UNIX IPC (off by default) will override the SIGPIPE signal handler,
+ *   and set it to SIG_IGN.
  *
  * Encoding of filenames
  * ---------------------
@@ -205,7 +209,7 @@ extern "C" {
  * relational operators (<, >, <=, >=).
  */
 #define MPV_MAKE_VERSION(major, minor) (((major) << 16) | (minor) | 0UL)
-#define MPV_CLIENT_API_VERSION MPV_MAKE_VERSION(1, 25)
+#define MPV_CLIENT_API_VERSION MPV_MAKE_VERSION(1, 26)
 
 /**
  * The API user is allowed to "#define MPV_ENABLE_DEPRECATED 0" before
@@ -385,10 +389,14 @@ const char *mpv_client_name(mpv_handle *ctx);
  *   equivalent to setting the --no-terminal option.
  *   (Technically, this also suppresses C signal handling.)
  * - No config files will be loaded. This is roughly equivalent to using
- *   --no-config. Since libmpv 1.15, you can actually re-enable this option,
+ *   --config=no. Since libmpv 1.15, you can actually re-enable this option,
  *   which will make libmpv load config files during mpv_initialize(). If you
  *   do this, you are strongly encouraged to set the "config-dir" option too.
  *   (Otherwise it will load the mpv command line player's config.)
+ *   For example:
+ *      mpv_set_option_string(mpv, "config-dir", "/my/path"); // set config root
+ *      mpv_set_option_string(mpv, "config", "yes"); // enable config loading
+ *      (call mpv_initialize() _after_ this)
  * - Idle mode is enabled, which means the playback core will enter idle mode
  *   if there are no more files to play on the internal playlist, instead of
  *   exiting. This is equivalent to the --idle option.
@@ -1580,11 +1588,19 @@ void mpv_wakeup(mpv_handle *ctx);
  *
  * Keep in mind that the callback will be called from foreign threads. You
  * must not make any assumptions of the environment, and you must return as
- * soon as possible. You are not allowed to call any client API functions
- * inside of the callback. In particular, you should not do any processing in
- * the callback, but wake up another thread that does all the work. It's also
- * possible that the callback is called from a thread while a mpv API function
- * is called (i.e. it can be reentrant).
+ * soon as possible (i.e. no long blocking waits). Exiting the callback through
+ * any other means than a normal return is forbidden (no throwing exceptions,
+ * no longjmp() calls). You must not change any local thread state (such as
+ * the C floating point environment).
+ *
+ * You are not allowed to call any client API functions inside of the callback.
+ * In particular, you should not do any processing in the callback, but wake up
+ * another thread that does all the work. The callback is meant strictly for
+ * notification only, and is called from arbitrary core parts of the player,
+ * that make no considerations for reentrant API use or allowing the callee to
+ * spend a lot of time doing other things. Keep in mind that it's also possible
+ * that the callback is called from a thread while a mpv API function is called
+ * (i.e. it can be reentrant).
  *
  * In general, the client API expects you to call mpv_wait_event() to receive
  * notifications, and the wakeup callback is merely a helper utility to make

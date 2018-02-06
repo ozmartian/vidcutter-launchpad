@@ -5,7 +5,7 @@
 #
 # VidCutter - media cutter & joiner
 #
-# copyright © 2017 Pete Alexandrou
+# copyright © 2018 Pete Alexandrou
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,7 +23,6 @@
 #######################################################################
 
 import functools
-import os
 
 from PyQt5.QtCore import Qt, QFile, QFileInfo, QTextStream
 from PyQt5.QtGui import QColor, QPalette
@@ -31,7 +30,6 @@ from PyQt5.QtWidgets import qApp, QStyle
 
 try:
     from PyQt5.QtWidgets import QProxyStyle
-
 except ImportError:
     from PyQt5.QtWidgets import QCommonStyle, QStyleFactory
 
@@ -51,16 +49,17 @@ except ImportError:
 class VideoStyle(QProxyStyle):
     # noinspection PyMethodOverriding
     def styleHint(self, hint, option, widget, returnData) -> int:
-        if hint == QStyle.SH_UnderlineShortcut:
+        if hint in {
+            QStyle.SH_UnderlineShortcut,
+            QStyle.SH_DialogButtons_DefaultButton,
+            QStyle.SH_DialogButtonBox_ButtonsHaveIcons
+        }:
             return 0
         return super(VideoStyle, self).styleHint(hint, option, widget, returnData)
 
     @staticmethod
-    def loadQSS(theme, devmode: bool = False) -> str:
-        if devmode:
-            filename = os.path.join(QFileInfo(__file__).absolutePath(), 'vidcutter/styles/{}.qss'.format(theme))
-        else:
-            filename = ':/styles/{}.qss'.format(theme)
+    def loadQSS(theme) -> str:
+        filename = ':/styles/{}.qss'.format(theme)
         if QFileInfo(filename).exists():
             qssfile = QFile(filename)
             qssfile.open(QFile.ReadOnly | QFile.Text)

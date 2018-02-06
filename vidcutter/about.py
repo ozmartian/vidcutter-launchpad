@@ -5,7 +5,7 @@
 #
 # VidCutter - media cutter & joiner
 #
-# copyright © 2017 Pete Alexandrou
+# copyright © 2018 Pete Alexandrou
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -27,14 +27,13 @@ import platform
 import sys
 from datetime import datetime
 
-from PyQt5.Qt import PYQT_VERSION_STR
-from PyQt5.QtCore import QPoint, QSize, Qt, QUrl
-from PyQt5.QtGui import QCloseEvent, QPixmap
-from PyQt5.QtWidgets import qApp, QDialog, QDialogButtonBox, QLabel, QTabWidget, QTextBrowser, QVBoxLayout
-from sip import SIP_VERSION_STR
+from PyQt5.Qt import PYQT_VERSION_STR, QT_VERSION_STR
+from PyQt5.QtCore import QSize, Qt, QUrl
+from PyQt5.QtGui import QCloseEvent
+from PyQt5.QtWidgets import (qApp, QDialog, QDialogButtonBox, QLabel, QStyleFactory, QTabWidget, QTextBrowser,
+                             QVBoxLayout)
 
 import vidcutter
-import vidcutter.libs.mpv as mpv
 
 
 class About(QDialog):
@@ -44,7 +43,7 @@ class About(QDialog):
         self.setObjectName('aboutwidget')
         self.setContentsMargins(0, 0, 0, 0)
         self.setWindowModality(Qt.ApplicationModal)
-        builddate = datetime.fromtimestamp(os.path.getmtime(mpv.__file__)).strftime('%d %b %Y')
+        builddate = datetime.fromtimestamp(os.path.getmtime(About.getBinPath())).strftime('%d %b %Y')
         pencolor1 = '#9A45A2' if self.parent.theme == 'dark' else '#642C68'
         pencolor2 = '#FFF' if self.parent.theme == 'dark' else '#000'
         appicon = self.parent.getAppIcon(encoded=True)
@@ -107,6 +106,13 @@ class About(QDialog):
         self.setMinimumSize(self.get_size(self.parent.parent.scale))
 
     @staticmethod
+    def getBinPath() -> str:
+        if getattr(sys, 'frozen', False) and not getattr(sys, '_MEIPASS', False):
+            return os.path.realpath(sys.argv[0])
+        else:
+            return sys.modules['mpv'].__file__
+
+    @staticmethod
     def get_size(mode: str = 'NORMAL') -> QSize:
         modes = {
             'LOW': QSize(450, 300),
@@ -128,24 +134,34 @@ class BaseTab(QTextBrowser):
         super(BaseTab, self).__init__(parent)
         self.setOpenExternalLinks(True)
         if parent.parent.theme == 'dark':
-            self.setStyleSheet('QTextBrowser { background-color: rgba(12, 15, 16, 210); color: #FFF; }')
+            bgcolor = 'rgba(12, 15, 16, 210)'
+            pencolor = '#FFF'
         else:
-            self.setStyleSheet('QTextBrowser { background-color: rgba(255, 255, 255, 200); color: #000; }')
+            bgcolor = 'rgba(255, 255, 255, 200)'
+            pencolor = '#000'
+        self.setStyleSheet('''
+            QTextBrowser {{
+                background-color: {bgcolor};
+                color: {pencolor};
+            }}'''.format(**locals()))
 
 
 class AboutTab(BaseTab):
     def __init__(self, parent=None):
         super(AboutTab, self).__init__(parent)
         self.parent = parent
-        linebreak = '<br/>' if sys.platform == 'win32' else '&nbsp;&nbsp;&nbsp;'
+        spacer = '&nbsp;&nbsp;&nbsp;'
+        mpv_version = self.parent.parent.mpvWidget.mpv.get_property('mpv-version').replace('mpv ', '')
+        mpv_version = mpv_version.split('-')[0:2]
+        mpv_version = '-'.join(mpv_version)
         # noinspection PyBroadException
         try:
             ffmpeg_version = self.parent.parent.videoService.version()
         except BaseException:
-            ffmpeg_version = '<span style="color:red;">MISSING</span>'
+            ffmpeg_version = '<span style="color:maroon; font-weight:bold;">MISSING</span>'
         html = '''
 <style>
-    table { width: 100%%; font-family: "Noto Sans UI", sans-serif; }
+    table { width: 100%%; font-family: "Noto Sans UI", sans-serif; background-color: transparent; }
     a { color: %s; text-decoration: none; font-weight: bold; }
 </style>
 <table border="0" cellpadding="8" cellspacing="4">
@@ -161,9 +177,9 @@ class AboutTab(BaseTab):
                             <br/>
                             <b>Python:</b> %s
                             &nbsp;&nbsp;&nbsp;
-                            <b>PyQt5:</b> %s
+                            <b>Qt:</b> %s
                             &nbsp;&nbsp;&nbsp;
-                            <b>SIP:</b> %s
+                            <b>PyQt:</b> %s
                         </p>
                         <p style="font-size:13px;">
                             Copyright &copy; %s <a href="mailto:%s">%s</a>
@@ -197,10 +213,9 @@ class AboutTab(BaseTab):
         </td>
     </tr>
 </table>''' % ('#EA95FF' if self.parent.parent.theme == 'dark' else '#441D4E',
-               self.parent.parent.mpvWidget.mpv.get_property('mpv-version').replace('mpv ', ''), linebreak,
-               ffmpeg_version, sys.version.split(' ')[0], PYQT_VERSION_STR, SIP_VERSION_STR, datetime.now().year,
-               vidcutter.__email__, vidcutter.__author__, vidcutter.__website__, vidcutter.__website__,
-               vidcutter.__bugreport__)
+               mpv_version, spacer, ffmpeg_version, sys.version.split(' ')[0], QT_VERSION_STR,
+               PYQT_VERSION_STR, datetime.now().year, vidcutter.__email__, vidcutter.__author__,
+               vidcutter.__website__, vidcutter.__website__, vidcutter.__bugreport__)
         self.setHtml(html)
 
 
@@ -209,8 +224,12 @@ class CreditsTab(BaseTab):
         super(CreditsTab, self).__init__(parent)
         self.parent = parent
         self.setObjectName('credits')
-        self.setHtml('''<style>a { color:%s; text-decoration:none; font-weight:bold; }
-        a:hover { text-decoration:underline; }</style>
+        self.setHtml('''
+        <style>
+            table { background-color: transparent; }
+            a { color:%s; text-decoration:none; font-weight:bold; }
+            a:hover { text-decoration:underline; }
+        </style>
         <h3 style="text-align:center;">CREDITS</h3>
         <p>
             This application either uses code and tools from the following projects in part or in their entirety as
@@ -261,3 +280,5 @@ class LicenseTab(BaseTab):
         super(LicenseTab, self).__init__(parent)
         self.setObjectName('license')
         self.setSource(QUrl('qrc:/license.html'))
+        if sys.platform in {'win32', 'darwin'}:
+            self.setStyle(QStyleFactory.create('Fusion'))        

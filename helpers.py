@@ -58,7 +58,7 @@ class SetupHelpers:
     @staticmethod
     def get_data_files():
         files = []
-        if sys.platform.startswith('linux'):
+        if sys.platform.startswith('linux') and 'QT_APPIMAGE' not in os.environ.keys():
             files = [
                 ('/usr/share/icons/hicolor/16x16/apps', ['data/icons/hicolor/16x16/apps/vidcutter.png']),
                 ('/usr/share/icons/hicolor/22x22/apps', ['data/icons/hicolor/22x22/apps/vidcutter.png']),
@@ -71,17 +71,22 @@ class SetupHelpers:
                 ('/usr/share/icons/hicolor/512x512/apps', ['data/icons/hicolor/512x512/apps/vidcutter.png']),
                 ('/usr/share/icons/hicolor/scalable/apps', ['data/icons/hicolor/scalable/apps/vidcutter.svg']),
                 ('/usr/share/pixmaps', ['data/icons/vidcutter.svg']),
-                ('/usr/share/applications', ['data/desktop/com.ozmartians.VidCutter.desktop']),
-                ('/usr/share/appdata', ['data/appdata/com.ozmartians.VidCutter.appdata.xml']),
-                ('/usr/share/mime/packages', ['data/mime/x-vidcutter.xml'])
+                ('/usr/share/applications', ['data/desktop/com.ozmartians.vidcutter.desktop']),
+                ('/usr/share/appdata', ['data/appdata/com.ozmartians.vidcutter.appdata.xml']),
+                ('/usr/share/metainfo', ['data/appdata/com.ozmartians.vidcutter.appdata.xml']),
+                ('/usr/share/mime/packages', ['data/mime/wtv.xml', 'data/mime/x-vidcutter.xml'])
             ]
         return files
 
     @staticmethod
     def get_latest_win32_libmpv(arch: int=64):
         from urllib.request import urlopen
+        import ssl
         import xmltodict
-        xml = urlopen('https://sourceforge.net/projects/mpv-player-windows/rss?path=/libmpv').read()
+        ctx = ssl.create_default_context()
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+        xml = urlopen('https://sourceforge.net/projects/mpv-player-windows/rss?path=/libmpv', context=ctx).read()
         data = xml.decode('utf-8')
         datadict = xmltodict.parse(data)
         link = datadict['rss']['channel']['item'][1 if arch == 32 else 0]['title']
@@ -89,7 +94,7 @@ class SetupHelpers:
 
     @staticmethod
     def get_latest_win32_libmpv_64():
-        return SetupHelpers.get_latest_win32_libmpv(64)
+        return SetupHelpers.get_latest_win32_libmpv()
 
     @staticmethod
     def get_latest_win32_libmpv_32():

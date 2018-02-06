@@ -5,7 +5,7 @@
 #
 # VidCutter - media cutter & joiner
 #
-# copyright © 2017 Pete Alexandrou
+# copyright © 2018 Pete Alexandrou
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,7 +22,9 @@
 #
 #######################################################################
 
-from PyQt5.QtCore import pyqtSlot
+import sys
+
+from PyQt5.QtCore import pyqtSlot, QSysInfo
 from PyQt5.QtDBus import QDBusConnection, QDBusMessage
 from PyQt5.QtWidgets import QWidget
 
@@ -32,17 +34,31 @@ import vidcutter
 class TaskbarProgress(QWidget):
     def __init__(self, parent=None):
         super(TaskbarProgress, self).__init__(parent)
-        self._desktopfile = 'application://{}.desktop'.format(vidcutter.__desktopid__)
+        self.parent = parent
         self._sessionbus = QDBusConnection.sessionBus()
-        self.clear()
+        if self._sessionbus.isConnected():
+            self._desktopfile = 'application://{}.desktop'.format(vidcutter.__desktopid__)
+            self.init()
 
     @pyqtSlot()
-    def clear(self):
-        self.setProgress(0.0, False)
+    def init(self) -> None:
+        if self._sessionbus.isConnected():
+            self.setProgress(0.0, False)
+        elif sys.platform == 'win32' and TaskbarProgress.isValidWinVer():
+            self.parent.win_taskbar_button.progress().reset()
 
     @pyqtSlot(float, bool)
-    def setProgress(self, value: float, visible: bool=True):
-        signal = QDBusMessage.createSignal('/com/canonical/unity/launcherentry/337963624',
-                                           'com.canonical.Unity.LauncherEntry', 'Update')
-        message = signal << self._desktopfile << {'progress-visible': visible, 'progress': value}
-        self._sessionbus.send(message)
+    def setProgress(self, value: float, visible: bool=True) -> bool:
+        if self._sessionbus.isConnected():
+            signal = QDBusMessage.createSignal('/com/canonical/unity/launcherentry/337963624',
+                                               'com.canonical.Unity.LauncherEntry', 'Update')
+            message = signal << self._desktopfile << {'progress-visible': visible, 'progress': value}
+            return self._sessionbus.send(message)
+        elif sys.platform == 'win32' and TaskbarProgress.isValidWinVer():
+            self.parent.win_taskbar_button.progress().setValue(int(value * 100))
+            return True
+
+    @staticmethod
+    def isValidWinVer() -> bool:
+        ver = QSysInfo.productVersion()
+        return True if ver not in {'XP', 'Vista'} else False

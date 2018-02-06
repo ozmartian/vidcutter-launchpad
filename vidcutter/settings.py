@@ -5,7 +5,7 @@
 #
 # VidCutter - media cutter & joiner
 #
-# copyright © 2017 Pete Alexandrou
+# copyright © 2018 Pete Alexandrou
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,13 +22,17 @@
 #
 #######################################################################
 
+import os
 import sys
 
-from PyQt5.QtCore import pyqtSlot, QSize, Qt
-from PyQt5.QtGui import QCloseEvent, QIcon, QShowEvent
-from PyQt5.QtWidgets import (qApp, QButtonGroup, QCheckBox, QDialog, QDialogButtonBox, QDoubleSpinBox, QFrame,
-                             QGridLayout, QGroupBox, QHBoxLayout, QLabel, QListView, QListWidget, QListWidgetItem,
-                             QMessageBox, QRadioButton, QStackedWidget, QStyleFactory, QVBoxLayout, QWidget)
+from PyQt5.QtCore import pyqtSlot, QDir, QSize, Qt
+from PyQt5.QtGui import QCloseEvent, QColor, QIcon, QPainter, QPen, QPixmap, QShowEvent
+from PyQt5.QtWidgets import (qApp, QButtonGroup, QCheckBox, QDialog, QDialogButtonBox, QDoubleSpinBox, QFileDialog,
+                             QFormLayout, QFrame, QGridLayout, QGroupBox, QHBoxLayout, QLabel, QLineEdit, QListView,
+                             QListWidget, QListWidgetItem, QMessageBox, QPushButton, QRadioButton, QSizePolicy,
+                             QSpacerItem, QStackedWidget, QStyleFactory, QVBoxLayout, QWidget)
+
+from vidcutter.libs.videoservice import VideoService
 
 
 class LogsPage(QWidget):
@@ -39,7 +43,7 @@ class LogsPage(QWidget):
         verboseCheckbox = QCheckBox('Enable verbose logging', self)
         verboseCheckbox.setToolTip('Detailed log ouput to log file and console')
         verboseCheckbox.setCursor(Qt.PointingHandCursor)
-        verboseCheckbox.setChecked(self.parent.parent.verboseLogs)
+        verboseCheckbox.setChecked(self.parent.parent.parent.verboseLogs)
         verboseCheckbox.stateChanged.connect(self.setVerboseLogs)
         verboseLabel = QLabel('''
             <b>ON:</b> includes detailed logs from video player (MPV) and backend services
@@ -72,53 +76,83 @@ class ThemePage(QWidget):
         self.setObjectName('settingsthemepage')
         mainLayout = QVBoxLayout()
         mainLayout.setSpacing(10)
-        if sys.platform != 'darwin':
-            self.lightRadio = QRadioButton(self)
-            self.lightRadio.setIcon(QIcon(':/images/%s/theme-light.png' % self.parent.theme))
-            self.lightRadio.setIconSize(QSize(165, 121))
-            self.lightRadio.setCursor(Qt.PointingHandCursor)
-            self.lightRadio.clicked.connect(self.switchTheme)
-            self.lightRadio.setChecked(self.parent.theme == 'light')
-            self.darkRadio = QRadioButton(self)
-            self.darkRadio.setIcon(QIcon(':/images/%s/theme-dark.png' % self.parent.theme))
-            self.darkRadio.setIconSize(QSize(165, 121))
-            self.darkRadio.setCursor(Qt.PointingHandCursor)
-            self.darkRadio.clicked.connect(self.switchTheme)
-            self.darkRadio.setChecked(self.parent.theme == 'dark')
-            themeLayout = QGridLayout()
-            themeLayout.setColumnStretch(0, 1)
-            themeLayout.addWidget(self.lightRadio, 0, 1)
-            themeLayout.addWidget(self.darkRadio, 0, 3)
-            themeLayout.addWidget(QLabel('Light', self), 1, 1, Qt.AlignHCenter)
-            themeLayout.setColumnStretch(2, 1)
-            themeLayout.addWidget(QLabel('Dark', self), 1, 3, Qt.AlignHCenter)
-            themeLayout.setColumnStretch(4, 1)
-            themeGroup = QGroupBox('Theme')
-            themeGroup.setLayout(themeLayout)
-            mainLayout.addWidget(themeGroup)
+        pen = QPen(QColor('#4D5355' if self.parent.theme == 'dark' else '#B9B9B9'))
+        pen.setWidth(2)
+        theme_light = QPixmap(':/images/theme-light.png', 'PNG')
+        painter = QPainter(theme_light)
+        painter.setPen(pen)
+        painter.setBrush(Qt.NoBrush)
+        painter.drawRect(0, 0, theme_light.width(), theme_light.height())
+        theme_dark = QPixmap(':/images/theme-dark.png', 'PNG')
+        painter = QPainter(theme_dark)
+        painter.setPen(pen)
+        painter.setBrush(Qt.NoBrush)
+        painter.drawRect(0, 0, theme_dark.width(), theme_dark.height())
+        self.lightRadio = QRadioButton(self)
+        self.lightRadio.setIcon(QIcon(theme_light))
+        self.lightRadio.setIconSize(QSize(165, 121))
+        self.lightRadio.setCursor(Qt.PointingHandCursor)
+        self.lightRadio.clicked.connect(self.switchTheme)
+        self.lightRadio.setChecked(self.parent.theme == 'light')
+        self.darkRadio = QRadioButton(self)
+        self.darkRadio.setIcon(QIcon(theme_dark))
+        self.darkRadio.setIconSize(QSize(165, 121))
+        self.darkRadio.setCursor(Qt.PointingHandCursor)
+        self.darkRadio.clicked.connect(self.switchTheme)
+        self.darkRadio.setChecked(self.parent.theme == 'dark')
+        themeLayout = QGridLayout()
+        themeLayout.setColumnStretch(0, 1)
+        themeLayout.addWidget(self.lightRadio, 0, 1)
+        themeLayout.addWidget(self.darkRadio, 0, 3)
+        themeLayout.addWidget(QLabel('Light', self), 1, 1, Qt.AlignHCenter)
+        themeLayout.setColumnStretch(2, 1)
+        themeLayout.addWidget(QLabel('Dark', self), 1, 3, Qt.AlignHCenter)
+        themeLayout.setColumnStretch(4, 1)
+        themeGroup = QGroupBox('Theme')
+        themeGroup.setLayout(themeLayout)
+        mainLayout.addWidget(themeGroup)
+        index_leftRadio = QRadioButton('Clips on left')
+        index_leftRadio.setToolTip('Display Clip Index on the left hand side')
+        index_leftRadio.setCursor(Qt.PointingHandCursor)
+        index_leftRadio.setChecked(self.parent.parent.indexLayout == 'left')
+        index_rightRadio = QRadioButton('Clips on right')
+        index_rightRadio.setToolTip('Display Clip Index on the right hand side')
+        index_rightRadio.setCursor(Qt.PointingHandCursor)
+        index_rightRadio.setChecked(self.parent.parent.indexLayout == 'right')
+        index_buttonGroup = QButtonGroup(self)
+        index_buttonGroup.addButton(index_leftRadio, 1)
+        index_buttonGroup.addButton(index_rightRadio, 2)
+        # noinspection PyUnresolvedReferences
+        index_buttonGroup.buttonClicked[int].connect(self.parent.parent.setClipIndexLayout)
+        indexLayout = QHBoxLayout()
+        indexLayout.addWidget(index_leftRadio)
+        indexLayout.addWidget(index_rightRadio)
+        layoutGroup = QGroupBox('Layout')
+        layoutGroup.setLayout(indexLayout)
+        mainLayout.addWidget(layoutGroup)
         toolbar_labels = self.parent.settings.value('toolbarLabels', 'beside', type=str)
-        toolbar_iconsRadio = QRadioButton('Icons only', self)
-        toolbar_iconsRadio.setToolTip('Icons only')
-        toolbar_iconsRadio.setCursor(Qt.PointingHandCursor)
-        toolbar_iconsRadio.setChecked(toolbar_labels == 'none')
-        toolbar_underRadio = QRadioButton('Text under icons', self)
-        toolbar_underRadio.setToolTip('Text under icons')
+        toolbar_notextRadio = QRadioButton('No text (buttons only)', self)
+        toolbar_notextRadio.setToolTip('No text (buttons only)')
+        toolbar_notextRadio.setCursor(Qt.PointingHandCursor)
+        toolbar_notextRadio.setChecked(toolbar_labels == 'none')
+        toolbar_underRadio = QRadioButton('Text under buttons', self)
+        toolbar_underRadio.setToolTip('Text under buttons')
         toolbar_underRadio.setCursor(Qt.PointingHandCursor)
         toolbar_underRadio.setChecked(toolbar_labels == 'under')
-        toolbar_besideRadio = QRadioButton('Text beside icons', self)
-        toolbar_besideRadio.setToolTip('Text beside icons')
+        toolbar_besideRadio = QRadioButton('Text beside buttons', self)
+        toolbar_besideRadio.setToolTip('Text beside buttons')
         toolbar_besideRadio.setCursor(Qt.PointingHandCursor)
         toolbar_besideRadio.setChecked(toolbar_labels == 'beside')
         toolbar_buttonGroup = QButtonGroup(self)
-        toolbar_buttonGroup.addButton(toolbar_iconsRadio, 1)
+        toolbar_buttonGroup.addButton(toolbar_besideRadio, 1)
         toolbar_buttonGroup.addButton(toolbar_underRadio, 2)
-        toolbar_buttonGroup.addButton(toolbar_besideRadio, 3)
+        toolbar_buttonGroup.addButton(toolbar_notextRadio, 3)
         # noinspection PyUnresolvedReferences
-        toolbar_buttonGroup.buttonClicked[int].connect(self.parent.parent.toolbar.setLabels)
+        toolbar_buttonGroup.buttonClicked[int].connect(self.setLabelStyle)
         toolbarLayout = QGridLayout()
         toolbarLayout.addWidget(toolbar_besideRadio, 0, 0)
         toolbarLayout.addWidget(toolbar_underRadio, 0, 1)
-        toolbarLayout.addWidget(toolbar_iconsRadio, 1, 0)
+        toolbarLayout.addWidget(toolbar_notextRadio, 1, 0)
         toolbarGroup = QGroupBox('Toolbar')
         toolbarGroup.setLayout(toolbarLayout)
         mainLayout.addWidget(toolbarGroup)
@@ -147,6 +181,17 @@ class ThemePage(QWidget):
         self.setLayout(mainLayout)
 
     @pyqtSlot(int)
+    def setLabelStyle(self, button_id: int) -> None:
+        if button_id == 2:
+            style = 'under'
+        elif button_id == 3:
+            style = 'none'
+        else:
+            style = 'beside'
+        self.parent.settings.setValue('toolbarLabels', style)
+        self.parent.parent.setToolBarStyle(style)
+
+    @pyqtSlot(int)
     def setNativeDialogs(self, state: int) -> None:
         self.parent.parent.saveSetting('nativeDialogs', state == Qt.Checked)
         self.parent.parent.nativeDialogs = (state == Qt.Checked)
@@ -169,7 +214,6 @@ class ThemePage(QWidget):
                         font-family: "Futura-Light", sans-serif;
                         font-weight: 400;
                     }
-                    p { font-size: 15px; }
                 </style>
                 <h1>Warning</h1>
                 <p>The application needs to be restarted in order to switch themes. Attempts will be made to reopen
@@ -227,6 +271,10 @@ class VideoPage(QWidget):
         videoGroup = QGroupBox('Playback')
         videoGroup.setLayout(videoLayout)
         zoomLevel = self.parent.settings.value('videoZoom', 0, type=int)
+        zoom_originalRadio = QRadioButton('No zoom [1:1]', self)
+        zoom_originalRadio.setToolTip('1/1 No zoom')
+        zoom_originalRadio.setCursor(Qt.PointingHandCursor)
+        zoom_originalRadio.setChecked(zoomLevel == 0)
         zoom_qtrRadio = QRadioButton('Quarter [1:4]', self)
         zoom_qtrRadio.setToolTip('1/4 Zoom')
         zoom_qtrRadio.setCursor(Qt.PointingHandCursor)
@@ -235,25 +283,21 @@ class VideoPage(QWidget):
         zoom_halfRadio.setToolTip('1/2 Half')
         zoom_halfRadio.setCursor(Qt.PointingHandCursor)
         zoom_halfRadio.setChecked(zoomLevel == -1)
-        zoom_originalRadio = QRadioButton('No zoom [1:1]', self)
-        zoom_originalRadio.setToolTip('1/1 No zoom')
-        zoom_originalRadio.setCursor(Qt.PointingHandCursor)
-        zoom_originalRadio.setChecked(zoomLevel == 0)
         zoom_doubleRadio = QRadioButton('Double [2:1]', self)
         zoom_doubleRadio.setToolTip('2/1 Double')
         zoom_doubleRadio.setCursor(Qt.PointingHandCursor)
         zoom_doubleRadio.setChecked(zoomLevel == 1)
         zoom_buttonGroup = QButtonGroup(self)
+        zoom_buttonGroup.addButton(zoom_originalRadio, 3)
         zoom_buttonGroup.addButton(zoom_qtrRadio, 1)
         zoom_buttonGroup.addButton(zoom_halfRadio, 2)
-        zoom_buttonGroup.addButton(zoom_originalRadio, 3)
         zoom_buttonGroup.addButton(zoom_doubleRadio, 4)
         # noinspection PyUnresolvedReferences
         zoom_buttonGroup.buttonClicked[int].connect(self.setZoom)
         zoomLayout = QGridLayout()
-        zoomLayout.addWidget(zoom_qtrRadio, 0, 0)
-        zoomLayout.addWidget(zoom_halfRadio, 0, 1)
-        zoomLayout.addWidget(zoom_originalRadio, 1, 0)
+        zoomLayout.addWidget(zoom_originalRadio, 0, 0)
+        zoomLayout.addWidget(zoom_qtrRadio, 0, 1)
+        zoomLayout.addWidget(zoom_halfRadio, 1, 0)
         zoomLayout.addWidget(zoom_doubleRadio, 1, 1)
         zoomGroup = QGroupBox('Zoom')
         zoomGroup.setLayout(zoomLayout)
@@ -296,6 +340,91 @@ class VideoPage(QWidget):
         self.parent.settings.setValue('videoZoom', level)
 
 
+class ToolsPage(QWidget):
+    def __init__(self, parent=None):
+        super(ToolsPage, self).__init__(parent)
+        self.parent = parent
+        self.setObjectName('settingstoolspage')
+        self.ffmpegpath = QLineEdit(QDir.toNativeSeparators(self.parent.service.backends.ffmpeg), self)
+        self.ffmpegpath.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        ffmpegbutton = QPushButton(self)
+        ffmpegbutton.setIcon(QIcon(':/images/folder.png'))
+        ffmpegbutton.setToolTip('Set FFmpeg path')
+        ffmpegbutton.setCursor(Qt.PointingHandCursor)
+        ffmpegbutton.clicked.connect(lambda c, backend='FFmpeg': self.setPath(backend, self.ffmpegpath))
+        ffmpeglayout = QHBoxLayout()
+        ffmpeglayout.addWidget(self.ffmpegpath)
+        ffmpeglayout.addWidget(ffmpegbutton)
+        self.ffprobepath = QLineEdit(QDir.toNativeSeparators(self.parent.service.backends.ffprobe), self)
+        self.ffprobepath.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        ffprobebutton = QPushButton(self)
+        ffprobebutton.setIcon(QIcon(':/images/folder.png'))
+        ffprobebutton.setToolTip('Set FFprobe path')
+        ffprobebutton.setCursor(Qt.PointingHandCursor)
+        ffprobebutton.clicked.connect(lambda c, backend='FFprobe': self.setPath(backend, self.ffprobepath))
+        ffprobelayout = QHBoxLayout()
+        ffprobelayout.addWidget(self.ffprobepath)
+        ffprobelayout.addWidget(ffprobebutton)
+        self.mediainfopath = QLineEdit(QDir.toNativeSeparators(self.parent.service.backends.mediainfo), self)
+        self.mediainfopath.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        mediainfobutton = QPushButton(self)
+        mediainfobutton.setIcon(QIcon(':/images/folder.png'))
+        mediainfobutton.setToolTip('Set MediaInfo path')
+        mediainfobutton.setCursor(Qt.PointingHandCursor)
+        mediainfobutton.clicked.connect(lambda c, backend='MediaInfo': self.setPath(backend, self.mediainfopath))
+        mediainfolayout = QHBoxLayout()
+        mediainfolayout.addWidget(self.mediainfopath)
+        mediainfolayout.addWidget(mediainfobutton)
+        resetbutton = QPushButton('Reset to Defaults', self)
+        resetbutton.setObjectName('resetpathsbutton')
+        resetbutton.setToolTip('Reset to default paths')
+        resetbutton.setCursor(Qt.PointingHandCursor)
+        resetbutton.clicked.connect(self.resetPaths)
+        resetlayout = QHBoxLayout()
+        resetlayout.addStretch(1)
+        resetlayout.addWidget(resetbutton)
+        pathsLayout = QFormLayout()
+        pathsLayout.setContentsMargins(11, 11, 11, 20)
+        pathsLayout.setVerticalSpacing(20)
+        pathsLayout.addRow('FFmpeg:', ffmpeglayout)
+        pathsLayout.addRow('FFprobe:', ffprobelayout)
+        pathsLayout.addRow('MediaInfo:', mediainfolayout)
+        pathsLayout.addRow('', resetlayout)
+        pathsGroup = QGroupBox('Paths')
+        pathsGroup.setLayout(pathsLayout)
+        mainLayout = QVBoxLayout()
+        mainLayout.setSpacing(10)
+        mainLayout.addWidget(pathsGroup)
+        mainLayout.addStretch(1)
+        self.setLayout(mainLayout)
+
+    @pyqtSlot()
+    def resetPaths(self) -> None:
+        self.parent.settings.beginGroup('tools')
+        self.parent.settings.setValue('ffmpeg', None)
+        self.parent.settings.setValue('ffprobe', None)
+        self.parent.settings.setValue('mediainfo', None)
+        self.parent.settings.endGroup()
+        self.parent.service.backends = VideoService.findBackends(self.parent.settings)
+        self.ffmpegpath.setText(self.parent.service.backends.ffmpeg)
+        self.ffprobepath.setText(self.parent.service.backends.ffprobe)
+        self.mediainfopath.setText(self.parent.service.backends.mediainfo)
+
+    def setPath(self, backend: str, field: QLineEdit) -> None:
+        path = field.text()
+        if path is None or not len(path):
+            path = self.parent.parent.lastFolder if os.path.exists(self.parent.parent.lastFolder) else QDir.homePath()
+        selectedpath, _ = QFileDialog.getOpenFileName(
+            self,
+            caption='Set {} path'.format(backend),
+            directory=path,
+            options=self.parent.parent.getFileDialogOptions())
+        if selectedpath is not None and os.path.isfile(selectedpath) and os.access(selectedpath, os.X_OK):
+            self.parent.service.backends[backend.lower()] = selectedpath
+            self.parent.settings.setValue('tools/{}'.format(backend.lower()), selectedpath)
+            field.setText(selectedpath)
+
+
 class GeneralPage(QWidget):
     def __init__(self, parent=None):
         super(GeneralPage, self).__init__(parent)
@@ -306,22 +435,27 @@ class GeneralPage(QWidget):
         smartCutCheckbox.setCursor(Qt.PointingHandCursor)
         smartCutCheckbox.setChecked(self.parent.parent.smartcut)
         smartCutCheckbox.stateChanged.connect(self.setSmartCut)
-        self.smartCutLabel = QLabel('''
-            <b>ON:</b> re-encode start + end portions of each clip at valid GOP (IDR) keyframes
-            <br/>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            - slowest + most accurate mode
-            <br/>
-            <b>OFF:</b> cut at nearest keyframe before/after your start/end markers
-            <br/>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            - fastest + less precise mode''', self)
-        self.smartCutLabel.setObjectName('smartcutlabel')
-        self.smartCutLabel.setTextFormat(Qt.RichText)
-        self.smartCutLabel.setAlignment(Qt.AlignTop)
-        self.smartCutLabel.setWordWrap(True)
-        if sys.platform != 'win32':
-            self.smartCutLabel.setMinimumHeight(self.smartCutLabel.heightForWidth(self.sizeHint().width()))
+        smartCutLabel1 = QLabel('<b>ON:</b> re-encode start + end portions of each clip at valid GOP (IDR) '
+                                'keyframes')
+        smartCutLabel1.setObjectName('smartcutlabel')
+        smartCutLabel1.setWordWrap(True)
+        smartCutLabel2 = QLabel('- slowest + most accurate mode')
+        smartCutLabel2.setObjectName('smartcutlabel')
+        smartCutLabel3 = QLabel('<b>OFF:</b> cut at nearest keyframe before/after your start/end markers')
+        smartCutLabel3.setObjectName('smartcutlabel')
+        smartCutLabel3.setWordWrap(True)
+        smartCutLabel4 = QLabel('- fastest + less precise mode')
+        smartCutLabel4.setObjectName('smartcutlabel')
+        smartCutLayout = QGridLayout()
+        smartCutLayout.setSpacing(0)
+        smartCutLayout.setContentsMargins(25, 0, 5, 10)
+        smartCutLayout.addWidget(smartCutLabel1, 0, 0, 1, 2)
+        smartCutLayout.addItem(QSpacerItem(25, 1), 1, 0)
+        smartCutLayout.addWidget(smartCutLabel2, 1, 1)
+        smartCutLayout.addWidget(smartCutLabel3, 2, 0, 1, 2)
+        smartCutLayout.addItem(QSpacerItem(25, 1), 3, 0)
+        smartCutLayout.addWidget(smartCutLabel4, 3, 1)
+        smartCutLayout.setColumnStretch(1, 1)
         self.singleInstance = self.parent.settings.value('singleInstance', 'on', type=str) in {'on', 'true'}
         singleInstanceCheckbox = QCheckBox('Allow only one running instance', self)
         singleInstanceCheckbox.setToolTip('Allow just one single %s instance to be running' % qApp.applicationName())
@@ -351,7 +485,7 @@ class GeneralPage(QWidget):
         keepClipsLabel.setWordWrap(True)
         generalLayout = QVBoxLayout()
         generalLayout.addWidget(smartCutCheckbox)
-        generalLayout.addWidget(self.smartCutLabel)
+        generalLayout.addLayout(smartCutLayout)
         generalLayout.addWidget(SettingsDialog.lineSeparator())
         generalLayout.addWidget(keepClipsCheckbox)
         generalLayout.addWidget(keepClipsLabel)
@@ -368,11 +502,6 @@ class GeneralPage(QWidget):
         seek1SpinBox.setValue(self.parent.parent.level1Seek)
         # noinspection PyUnresolvedReferences
         seek1SpinBox.valueChanged[float].connect(lambda d: self.setSpinnerValue(1, d))
-        seek1Layout = QHBoxLayout()
-        seek1Layout.addStretch(1)
-        seek1Layout.addWidget(QLabel('Level #1'))
-        seek1Layout.addWidget(seek1SpinBox)
-        seek1Layout.addStretch(1)
         seek2SpinBox = QDoubleSpinBox(self)
         seek2SpinBox.setDecimals(1)
         seek2SpinBox.setRange(0.1, 999.9)
@@ -381,24 +510,22 @@ class GeneralPage(QWidget):
         seek2SpinBox.setValue(self.parent.parent.level2Seek)
         # noinspection PyUnresolvedReferences
         seek2SpinBox.valueChanged[float].connect(lambda d: self.setSpinnerValue(2, d))
-        seekLabel = QLabel('''
-            <b>NOTE:</b> these settings affect the seeking time forwards and backwards
-            via the UP/DOWN and SHIFT + UP/DOWN keys. see the <i>Keyboard shortcuts</i> menu
-            option for a full list of available shortcuts
-        ''', self)
+        seekLabel = QLabel('''<b>NOTE:</b> these settings affect the seeking time forwards
+            and backwards via the UP/DOWN and SHIFT + UP/DOWN keys. see the
+            <i>Keyboard shortcuts</i> menu option for a full list of available shortcuts''', self)
         seekLabel.setObjectName('seeksettingslabel')
         seekLabel.setTextFormat(Qt.RichText)
         seekLabel.setWordWrap(True)
-        seek2Layout = QHBoxLayout()
-        seek2Layout.addStretch(1)
-        seek2Layout.addWidget(QLabel('Level #2'))
-        seek2Layout.addWidget(seek2SpinBox)
-        seek2Layout.addStretch(1)
-        seekWidgetsLayout = QHBoxLayout()
-        seekWidgetsLayout.addLayout(seek1Layout)
-        seekWidgetsLayout.addLayout(seek2Layout)
+        spinnersLayout = QHBoxLayout()
+        spinnersLayout.addStretch(1)
+        spinnersLayout.addWidget(QLabel('Level #1', self))
+        spinnersLayout.addWidget(seek1SpinBox)
+        spinnersLayout.addStretch(1)
+        spinnersLayout.addWidget(QLabel('Level #2', self))
+        spinnersLayout.addWidget(seek2SpinBox)
+        spinnersLayout.addStretch(1)
         seekLayout = QVBoxLayout()
-        seekLayout.addLayout(seekWidgetsLayout)
+        seekLayout.addLayout(spinnersLayout)
         seekLayout.addWidget(seekLabel)
         self.seekGroup = QGroupBox('Seeking')
         self.seekGroup.setLayout(seekLayout)
@@ -444,13 +571,16 @@ class GeneralPage(QWidget):
 
 
 class SettingsDialog(QDialog):
-    def __init__(self, parent=None, flags=Qt.WindowCloseButtonHint):
+    def __init__(self, service: VideoService, parent=None, flags=Qt.WindowCloseButtonHint):
         super(SettingsDialog, self).__init__(parent.parent, flags)
         self.parent = parent
+        self.service = service
         self.settings = self.parent.settings
         self.theme = self.parent.theme
         self.setObjectName('settingsdialog')
-        self.setWindowTitle('Settings - {0}'.format(qApp.applicationName()))
+        if sys.platform == 'win32':
+            self.setStyle(QStyleFactory.create('Fusion'))
+        self.setWindowTitle('Settings')
         self.categories = QListWidget(self)
         self.categories.setResizeMode(QListView.Fixed)
         self.categories.setStyleSheet('QListView::item { text-decoration: none; }')
@@ -466,6 +596,7 @@ class SettingsDialog(QDialog):
         self.pages.addWidget(GeneralPage(self))
         self.pages.addWidget(VideoPage(self))
         self.pages.addWidget(ThemePage(self))
+        self.pages.addWidget(ToolsPage(self))
         self.pages.addWidget(LogsPage(self))
         self.initCategories()
         horizontalLayout = QHBoxLayout()
@@ -497,6 +628,12 @@ class SettingsDialog(QDialog):
         themeButton.setToolTip('Theme settings')
         themeButton.setTextAlignment(Qt.AlignHCenter)
         themeButton.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+        ffmpegButton = QListWidgetItem(self.categories)
+        ffmpegButton.setIcon(QIcon(':/images/settings-ffmpeg.png'))
+        ffmpegButton.setText('Tools')
+        ffmpegButton.setToolTip('Tools settings')
+        ffmpegButton.setTextAlignment(Qt.AlignHCenter)
+        ffmpegButton.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
         logsButton = QListWidgetItem(self.categories)
         logsButton.setIcon(QIcon(':/images/settings-logs.png'))
         logsButton.setText('Logs')
