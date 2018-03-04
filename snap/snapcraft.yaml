@@ -18,7 +18,7 @@ apps:
     vidcutter:
         command: vidcutter
         plugs: [home, pulseaudio, alsa, opengl]
-        desktop: vidcutter.desktop
+        desktop: usr/share/applications/com.ozmartians.vidcutter.desktop
 
 parts:
     vidcutter:
