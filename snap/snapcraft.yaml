@@ -11,8 +11,8 @@ description: |
     MediaInfo powering the backend.
 icon: vidcutter.png
 
-grade: devel
-confinement: devmode
+grade: stable
+confinement: strict
 
 apps:
 
