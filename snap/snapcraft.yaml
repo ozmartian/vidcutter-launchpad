@@ -16,14 +16,16 @@ confinement: devmode
 apps:
 
     vidcutter:
-        command: vidcutter
-        plugs: [home, pulseaudio, alsa, opengl]
+        command: desktop-launch vidcutter
+        plugs: [desktop, home, pulseaudio, alsa, opengl]
         desktop: usr/share/applications/com.ozmartians.vidcutter.desktop
 
 parts:
     vidcutter:
-        plugin: python3
-        # source: git://github.com/ozmartian/vidcutter.git
+        plugin: python
+        source: https://github.com/ozmartian/vidcutter.git
+        source-type: git
+        source-depth: 1 
         process-dependency-links: false
         after: [desktop-qt5]
         build-packages:
@@ -45,8 +47,11 @@ parts:
             - ttf-ubuntu-font-family
             - dmz-cursor-theme
             - light-themes
+            - adwaita-icon-theme
+            - gnome-themes-standard
             - shared-mime-info
             - libqt5gui5
             - libgdk-pixbuf2.0-0
             - libqt5svg5
             - locales-all
+            - xdg-user-dirs
