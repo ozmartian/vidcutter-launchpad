@@ -38,13 +38,13 @@ parts:
             - libmpv1
             - ffmpeg
             - mediainfo
+            # - python3-pyqt5
+            # - python3-pyqt5.qtopengl
+            # - python3-pyqt5.qtx11extras
+            # - python3-opengl
         python-packages:
             - pyqt5
             - pyopengl
-        # prime:
-        #     - usr/share/applications/com.ozmartians.vidcutter.desktop
-        #     - usr/share/icons/**/vidcutter.png
-        #     - usr/share/metainfo/com.ozmartians.vidcutter.appdata.xml
         install: |
             sed -i 's|Icon=vidcutter|Icon=${SNAP}/usr/share/icons/hicolor/256x256/apps/vidcutter.png|g' ${SNAPCRAFT_PART_INSTALL}/usr/share/applications/com.ozmartians.vidcutter.desktop
 
@@ -57,9 +57,9 @@ parts:
             - adwaita-icon-theme
             - gnome-themes-standard
             - shared-mime-info
-            - libqt5gui5
+            # - libqt5gui5
             - libgdk-pixbuf2.0-0
-            - libqt5svg5
+            # - libqt5svg5
             - locales-all
             - xdg-user-dirs
             - mesa-vdpau-drivers
