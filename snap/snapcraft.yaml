@@ -1,7 +1,8 @@
 name: vidcutter
 version: 5.5.0
 type: app
-architectures: [amd64, i386]
+architectures:
+    - amd64
 summary: the simplest + fastest video cutter and joiner
 description: |
     A modern, simple to use, constantly evolving and 
@@ -17,15 +18,16 @@ apps:
 
     vidcutter:
         command: desktop-launch vidcutter
-        plugs: [desktop, home, pulseaudio, alsa, opengl]
+        plugs: [unity7, x11, wayland, desktop, home, pulseaudio, alsa, opengl]
         desktop: usr/share/applications/com.ozmartians.vidcutter.desktop
 
 parts:
     vidcutter:
         plugin: python
-        source: https://github.com/ozmartian/vidcutter.git
-        source-type: git
-        source-depth: 1 
+        python-version: python3
+        # source: https://github.com/ozmartian/vidcutter.git
+        # source-type: git
+        # source-depth: 1
         process-dependency-links: false
         after: [desktop-qt5]
         build-packages:
@@ -33,13 +35,18 @@ parts:
             - python3-setuptools
             - libmpv-dev
         stage-packages:
-            - python3-pyqt5
-            - python3-pyqt5.qtopengl
-            - python3-pyqt5.qtx11extras
-            - python3-opengl
             - libmpv1
             - ffmpeg
             - mediainfo
+        python-packages:
+            - pyqt5
+            - pyopengl
+        # prime:
+        #     - usr/share/applications/com.ozmartians.vidcutter.desktop
+        #     - usr/share/icons/**/vidcutter.png
+        #     - usr/share/metainfo/com.ozmartians.vidcutter.appdata.xml
+        install: |
+            sed -i 's|Icon=vidcutter|Icon=${SNAP}/usr/share/icons/hicolor/256x256/apps/vidcutter.png|g' ${SNAPCRAFT_PART_INSTALL}/usr/share/applications/com.ozmartians.vidcutter.desktop
 
     desktop-qt5:
         stage-packages:
@@ -55,3 +62,4 @@ parts:
             - libqt5svg5
             - locales-all
             - xdg-user-dirs
+            - mesa-vdpau-drivers
