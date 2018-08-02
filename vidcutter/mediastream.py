@@ -56,8 +56,6 @@ class StreamSelector(QDialog):
             layout.addWidget(self.subtitles())
         layout.addWidget(buttons)
         self.setLayout(layout)
-        self.setMinimumSize(500, 300)
-        self.setMaximumSize(500, 600)
 
     @staticmethod
     def lineSeparator() -> QFrame:
@@ -89,13 +87,12 @@ class StreamSelector(QDialog):
                                                     codec=self.streams.video.codec_long_name,
                                                     width=self.streams.video.width,
                                                     height=self.streams.video.height,
-                                                    framerate=framerate,
-                                                    ratio=ratio,
+                                                    framerate='{0:.2f}'.format(framerate),
+                                                    ratio='{0:.2f}'.format(ratio),
                                                     pixfmt=self.streams.video.pix_fmt), self)
         label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         videolayout = QHBoxLayout()
         videolayout.setSpacing(15)
-        videolayout.setContentsMargins(15, 10, 15, 10)
         videolayout.addSpacing(25)
         videolayout.addWidget(icon)
         videolayout.addSpacing(45)
@@ -108,6 +105,7 @@ class StreamSelector(QDialog):
         audiolayout = QGridLayout()
         audiolayout.setSpacing(15)
         for stream in self.streams.audio:
+            sameplerate = round(int(stream.sample_rate) / 1000, 1)
             checkbox = StreamSelectorCheckBox(stream.index, 'Toggle audio stream', self)
             icon = StreamSelectorLabel('<img src=":images/{}/streams-audio.png" />'.format(self.parent.theme),
                                        checkbox, True, self)
@@ -115,8 +113,8 @@ class StreamSelector(QDialog):
             if hasattr(stream, 'tags') and hasattr(stream.tags, 'language'):
                 labeltext += '<b>language:</b> {}<br/>'.format(ISO639_2[stream.tags.language])
             labeltext += '<b>codec:</b> {}<br/>'.format(stream.codec_long_name)
-            labeltext += '<b>channels:</b> {} &nbsp; <b>sample rate:</b> {} kHz' \
-                         .format(stream.channels, round(int(stream.sample_rate) / 1000, 1))
+            labeltext += '<b>channels:</b> {0} &nbsp; <b>sample rate:</b> {1:.2f} kHz' \
+                         .format(stream.channels, sameplerate)
             label = StreamSelectorLabel(labeltext, checkbox, False, self)
             rows = audiolayout.rowCount()
             audiolayout.addWidget(checkbox, rows, 0)
@@ -136,7 +134,7 @@ class StreamSelector(QDialog):
             widget.setMinimumWidth(400)
             widget.setLayout(audiolayout)
             scrolllayout = QHBoxLayout()
-            scrolllayout.addWidget(StreamSelectorScrollArea(widget, 200, self))
+            scrolllayout.addWidget(StreamSelectorScrollArea(widget, 200, self.parent.theme, self))
             audiogroup.setLayout(scrolllayout)
         else:
             audiogroup.setLayout(audiolayout)
@@ -172,7 +170,7 @@ class StreamSelector(QDialog):
             widget.setMinimumWidth(400)
             widget.setLayout(subtitlelayout)
             scrolllayout = QHBoxLayout()
-            scrolllayout.addWidget(StreamSelectorScrollArea(widget, 170, self))
+            scrolllayout.addWidget(StreamSelectorScrollArea(widget, 170, self.parent.theme, self))
             subtitlegroup.setStyleSheet('QGroupBox { padding-right: 0; }')
             subtitlegroup.setLayout(scrolllayout)
         else:
@@ -202,8 +200,8 @@ class StreamSelector(QDialog):
                 <style>
                     h2 {{
                         color: {};
-                        font-family: "Futura-Light", sans-serif;
-                        font-weight: 400;
+                        font-family: "Futura LT", sans-serif;
+                        font-weight: normal;
                     }}
                 </style>
                 <table border="0" cellpadding="6" cellspacing="0" width="350">
@@ -227,15 +225,31 @@ class StreamSelector(QDialog):
                 event.ignore()
                 return
         event.accept()
+        self.deleteLater()
         super(StreamSelector, self).closeEvent(event)
 
 
 class StreamSelectorScrollArea(QScrollArea):
-    def __init__(self, widget: QWidget, minHeight: int, parent=None):
+    def __init__(self, widget: QWidget, minHeight: int, theme: str, parent):
         super(StreamSelectorScrollArea, self).__init__(parent)
-        self.setStyleSheet('QScrollArea { background-color: transparent; margin-bottom: 20px; }')
         if sys.platform in {'win32', 'darwin'}:
             self.setStyle(QStyleFactory.create('Fusion'))
+        # noinspection PyUnresolvedReferences
+        if parent.parent.parent.stylename == 'fusion' or sys.platform in {'win32', 'darwin'}:
+            self.setStyleSheet('''
+            QScrollArea {{
+                background-color: transparent;
+                margin-bottom: 10px;
+                border: none;
+                border-right: 1px solid {};
+            }}'''.format('#4D5355' if theme == 'dark' else '#C0C2C3'))
+        else:
+            self.setStyleSheet('''
+            QScrollArea {{
+                background-color: transparent;
+                margin-bottom: 10px;
+                border: none;
+            }}''')
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setFrameShape(QFrame.NoFrame)
         self.setMinimumHeight(minHeight)

@@ -54,8 +54,8 @@ class VideoConsole(QTextEdit):
 
 
 class ConsoleWidget(QDialog):
-    def __init__(self, parent=None):
-        super(ConsoleWidget, self).__init__(parent)
+    def __init__(self, parent=None, flags=Qt.Dialog | Qt.WindowCloseButtonHint):
+        super(ConsoleWidget, self).__init__(parent, flags)
         self.parent = parent
         self.edit = VideoConsole(self)
         buttons = QDialogButtonBox()
@@ -70,7 +70,6 @@ class ConsoleWidget(QDialog):
         layout.addWidget(buttons)
         self.setLayout(layout)
         self.setWindowTitle('{0} Console'.format(qApp.applicationName()))
-        self.setWindowFlags(Qt.Window | Qt.WindowCloseButtonHint)
         self.setWindowModality(Qt.NonModal)
 
     def showEvent(self, event: QShowEvent):
@@ -88,12 +87,7 @@ class ConsoleHandler(QObject, logging.StreamHandler):
     def __init__(self, widget):
         QObject.__init__(self)
         logging.StreamHandler.__init__(self)
-        self._widget = widget
-        self.logReceived.connect(self._widget.edit.write)
-
-    @property
-    def widget(self):
-        return self._widget
+        self.logReceived.connect(widget.edit.write)
 
     def emit(self, record):
         self.logReceived.emit(record.message)
@@ -104,5 +98,7 @@ class VideoLogger(logging.Logger):
         super(VideoLogger, self).__init__(name, level)
         self.pp = pprint.PrettyPrinter(indent=2, compact=False)
 
-    def info(self, msg, pretty: bool=False, *args, **kwargs):
-        return super(VideoLogger, self).info(self.pp.pformat(msg) if pretty else msg, *args, **kwargs)
+    def info(self, msg, *args, **kwargs):
+        if 'pretty' in list(kwargs.keys()) and kwargs.pop('pretty'):
+            msg = self.pp.pformat(msg)
+        return super(VideoLogger, self).info(msg, *args, **kwargs)
