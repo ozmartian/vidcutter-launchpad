@@ -34,4 +34,4 @@ __email__ = 'pete@ozmartians.com'
 __website__ = 'https://vidcutter.ozmartians.com'
 __bugreport__ = 'https://github.com/ozmartian/vidcutter/issues'
 
-__isdeb__ = False
+__ispypi__ = False
