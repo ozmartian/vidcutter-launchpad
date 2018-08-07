@@ -67,7 +67,7 @@ parts:
         python-packages:
             - pyqt5
             - pyopengl
-			- simplejson
+            - simplejson
         install: |
             # sed -i 's|Icon=vidcutter|Icon=${SNAP}/usr/share/icons/hicolor/256x256/apps/vidcutter.png|g' ${SNAPCRAFT_PART_INSTALL}/usr/share/applications/com.ozmartians.vidcutter.desktop
             rm ${SNAPCRAFT_PART_INSTALL}/lib/python3.5/site-packages/PyQt5/Qt/lib/libQt5WebEngineCore.so.5
