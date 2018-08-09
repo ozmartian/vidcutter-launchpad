@@ -39,6 +39,7 @@ parts:
     desktop-qt5:
         after: [prepare]
         stage-packages:
+            - libc6
             - libxkbcommon0
             - ttf-ubuntu-font-family
             - dmz-cursor-theme
@@ -52,18 +53,18 @@ parts:
             - mesa-vdpau-drivers
             - libglu1-mesa
             - libdb5.3
-            - libc6
 
     vidcutter:
         plugin: python
         python-version: python3
-        process-dependency-links: false
+        process-dependency-links: true
         after: [prepare, desktop-qt5]
         build-packages:
             - python3-dev
             - python3-setuptools
             - libmpv-dev
         stage-packages:
+            - libc6
             - libmpv1
             - ffmpeg
             - mediainfo
