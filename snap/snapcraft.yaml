@@ -25,18 +25,15 @@ parts:
         plugin: nil
         build-packages:
             - software-properties-common
-            - lxd
         override-build: |
-            add-apt-repository ppa:mc3man/bionic-media -y
-            add-apt-repository ppa:jonathonf/ffmpeg-4 -y
+            add-apt-repository ppa:savoury1/ffmpeg4 -y
+            add-apt-repository ppa:savoury1/mpv -y
             apt update
             apt upgrade -yy
         prime: [-*]
 
     desktop-qt5:
         after: [prepare]
-        build-packages:
-            - lxd
         stage-packages:
             - libxkbcommon0
             - ttf-ubuntu-font-family
@@ -48,6 +45,8 @@ parts:
             - libgdk-pixbuf2.0-0
             - locales-all
             - xdg-user-dirs
+            - mesa-vdpau-drivers
+            - libglu1-mesa
             - libdb5.3
 
     vidcutter:
@@ -58,14 +57,13 @@ parts:
             - python3-dev
             - python3-setuptools
             - libmpv-dev
-            - lxd
         stage-packages:
             - libmpv1
             - ffmpeg
             - mediainfo
-            - mesa-vdpau-drivers
-            - libglu1-mesa
         python-packages:
             - pyqt5
             - pyopengl
             - simplejson
+        override-build: |
+            sed -i 's|Icon=.*|Icon=${SNAP}/share/icons/hicolor/512x512/apps/com.ozmartians.VidCutter.png|g' ${SNAPCRAFT_PART_INSTALL}/share/applications/com.ozmartians.VidCutter.desktop
