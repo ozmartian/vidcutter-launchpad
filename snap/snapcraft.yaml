@@ -26,7 +26,7 @@ parts:
         build-packages:
             - software-properties-common
         override-build: |
-            add-apt-repository ppa:jonathonf/ffmpeg-4 -y
+            add-apt-repository ppa:savoury1/ffmpeg4 -y
             add-apt-repository ppa:savoury1/display -y
             apt update
             apt upgrade -yy
