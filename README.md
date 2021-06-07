@@ -1,6 +1,5 @@
 ![VidCutter](http://vidcutter.ozmartians.com/vidcutter-banner.png)
 
-[![AUR](https://img.shields.io/aur/version/vidcutter.svg)](https://aur.archlinux.org/packages/vidcutter)
 [![AUR-GIT](https://img.shields.io/aur/version/vidcutter-git.svg)](https://aur.archlinux.org/packages/vidcutter-git)
 [![Build Status](https://travis-ci.org/ozmartian/vidcutter-appimage.svg)](https://github.com/ozmartian/vidcutter-appimage/releases/latest) 
 [![Build Status](https://travis-ci.org/ozmartian/vidcutter-osx.svg?branch=master)](https://github.com/ozmartian/vidcutter-osx/releases/latest)
@@ -73,7 +72,7 @@ Native installers for Windows and macOS are available on the releases page with 
 For macOS users of Homebrew, VidCutter can be easily installed as a "cask". With Homebrew already installed, just run the following terminal command:
 
 ```
-$ brew cask install vidcutter
+$ brew install vidcutter
 ```
 
 #### Chocolatey package
@@ -96,15 +95,13 @@ for Windows).
 
 #### Arch Linux
 
-Users can install directly from AUR, package is available in both stable and git-latest versions:
-
-    AUR: vidcutter, vidcutter-git
-    
-Using an AUR helper like pacaur (replace pacaur with yaourt or other AUR helper):
-
+Users can install directly from Arch's community repo since VidCutter has been added to Arch's official repos. There is also an AUR development version available.
+   
     LATEST STABLE RELEASE:
 
-        pacaur -S vidcutter
+        pacman -S vidcutter
+
+Using an AUR helper like pacaur (replace pacaur with any other AUR helper):
 
     LATEST DEVELOPMENT RELEASE:
     
