@@ -30,8 +30,8 @@ parts:
             add-apt-repository ppa:savoury1/backports -y
             add-apt-repository ppa:savoury1/graphics -y
             add-apt-repository ppa:savoury1/multimedia -y
-            add-apt-repository ppa:savoury1/ffmpeg4 -y
             add-apt-repository ppa:savoury1/mpv -y
+            add-apt-repository ppa:jonathonf/ffmpeg-4 -y
             apt update
             apt upgrade -yy
         prime: [-*]
