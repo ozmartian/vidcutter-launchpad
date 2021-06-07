@@ -26,9 +26,12 @@ parts:
         build-packages:
             - software-properties-common
         override-build: |
+            add-apt-repository ppa:savoury1/build-tools -y
+            add-apt-repository ppa:savoury1/backports -y
+            add-apt-repository ppa:savoury1/graphics -y
             add-apt-repository ppa:savoury1/multimedia -y
+            add-apt-repository ppa:savoury1/ffmpeg4 -y
             add-apt-repository ppa:savoury1/mpv -y
-            add-apt-repository ppa:jonathonf/ffmpeg-4 -y
             apt update
             apt upgrade -yy
         prime: [-*]
@@ -57,24 +60,8 @@ parts:
         build-packages:
             - python3-dev
             - python3-setuptools
-            - libass9
-            - libbluray2
-            - libdvdread8
-            - librubberband2
-            - libsndio7.1
-            - libva-drm2
-            - libva-wayland2
-            - libva-x11-2
             - libmpv-dev
         stage-packages:
-            - libass9
-            - libbluray2
-            - libdvdread8
-            - librubberband2
-            - libsndio7.1
-            - libva-drm2
-            - libva-wayland2
-            - libva-x11-2
             - libmpv1
             - ffmpeg
             - mediainfo
