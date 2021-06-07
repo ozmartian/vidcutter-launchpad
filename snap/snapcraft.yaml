@@ -35,6 +35,8 @@ parts:
 
     desktop-qt5:
         after: [prepare]
+        build-packages:
+            - lxd
         stage-packages:
             - libxkbcommon0
             - ttf-ubuntu-font-family
@@ -46,10 +48,7 @@ parts:
             - libgdk-pixbuf2.0-0
             - locales-all
             - xdg-user-dirs
-            - mesa-vdpau-drivers
-            - libglu1-mesa
             - libdb5.3
-            - lxd
 
     vidcutter:
         plugin: python
@@ -59,11 +58,13 @@ parts:
             - python3-dev
             - python3-setuptools
             - libmpv-dev
-        stage-packages:
             - lxd
+        stage-packages:
             - libmpv1
             - ffmpeg
             - mediainfo
+            - mesa-vdpau-drivers
+            - libglu1-mesa
         python-packages:
             - pyqt5
             - pyopengl
