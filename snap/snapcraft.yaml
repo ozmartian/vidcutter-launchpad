@@ -26,8 +26,12 @@ parts:
         build-packages:
             - software-properties-common
         override-build: |
+            add-apt-repository ppa:savoury1/build-tools
+            add-apt-repository ppa:savoury1/backports
+            add-apt-repository ppa:savoury1/graphics
+            add-apt-repository ppa:savoury1/multimedia
+            add-apt-repository ppa:savoury1/mpv -y
             add-apt-repository ppa:jonathonf/ffmpeg-4 -y
-            add-apt-repository ppa:savoury1/display -y
             apt update
             apt upgrade -yy
         prime: [-*]
