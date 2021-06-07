@@ -58,6 +58,16 @@ parts:
             - python3-setuptools
             - libmpv-dev
         stage-packages:
+            - libass9
+            - libbluray2
+            - libdvdread8
+            - libjack-0.125
+            - librubberband2
+            - libsndio7.1
+            - libva-drm2
+            - libva-wayland2
+            - libva-x11-2
+            - libva2
             - libmpv1
             - ffmpeg
             - mediainfo
