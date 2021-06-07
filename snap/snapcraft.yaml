@@ -25,6 +25,7 @@ parts:
         plugin: nil
         build-packages:
             - software-properties-common
+            - lxd
         override-build: |
             add-apt-repository ppa:mc3man/bionic-media -y
             add-apt-repository ppa:jonathonf/ffmpeg-4 -y
@@ -48,6 +49,7 @@ parts:
             - mesa-vdpau-drivers
             - libglu1-mesa
             - libdb5.3
+            - lxd
 
     vidcutter:
         plugin: python
@@ -58,6 +60,7 @@ parts:
             - python3-setuptools
             - libmpv-dev
         stage-packages:
+            - lxd
             - libmpv1
             - ffmpeg
             - mediainfo
