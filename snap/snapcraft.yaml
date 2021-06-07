@@ -68,5 +68,3 @@ parts:
             - pyqt5
             - pyopengl
             - simplejson
-        override-build: |
-            sed -i 's|Icon=.*|Icon=${SNAP}/share/icons/hicolor/512x512/apps/com.ozmartians.VidCutter.png|g' ${SNAPCRAFT_PART_INSTALL}/share/applications/com.ozmartians.VidCutter.desktop
