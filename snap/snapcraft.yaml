@@ -1,5 +1,5 @@
 name: vidcutter
-version: 6.0.0
+version: 6.0.5
 type: app
 architectures:
     - amd64
@@ -25,11 +25,6 @@ parts:
         plugin: nil
         build-packages:
             - software-properties-common
-        override-build: |
-            add-apt-repository ppa:mc3man/mpv-tests -y
-            add-apt-repository ppa:jonathonf/ffmpeg-3 -y
-            apt update
-            apt upgrade -yy
         prime: [-*]
 
     desktop-qt5:
@@ -62,7 +57,7 @@ parts:
             - ffmpeg
             - mediainfo
         python-packages:
-            - pyqt5==5.10.1
+            - pyqt5
             - pyopengl
             - simplejson
         install: |
