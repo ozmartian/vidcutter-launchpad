@@ -1,6 +1,7 @@
 name: vidcutter
 version: 6.0.5
 type: app
+base: core20
 architectures:
     - amd64
 summary: the simplest + fastest media cutter and joiner
@@ -25,11 +26,6 @@ parts:
         plugin: nil
         build-packages:
             - software-properties-common
-        override-build: |
-            add-apt-repository ppa:savoury1/ffmpeg4 -y
-            add-apt-repository ppa:savoury1/mpv -y
-            apt update
-            apt upgrade -yy
         prime: [-*]
 
     desktop-qt5:
@@ -58,12 +54,12 @@ parts:
             - python3-setuptools
             - libmpv-dev
         stage-packages:
+            - python3-opengl
+            - python3-simplejson
+            - python3-pyqt5
+            - python3-pyqt5.qtx11extras
             - libmpv1
             - ffmpeg
             - mediainfo
-        python-packages:
-            - pyqt5==5.10.1
-            - pyopengl
-            - simplejson
         override-build: |
             sed -i 's|Icon=.*|Icon=${SNAP}/share/icons/hicolor/512x512/apps/com.ozmartians.VidCutter.png|g' ${SNAPCRAFT_PART_INSTALL}/share/applications/com.ozmartians.VidCutter.desktop
