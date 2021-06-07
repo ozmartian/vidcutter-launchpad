@@ -25,6 +25,11 @@ parts:
         plugin: nil
         build-packages:
             - software-properties-common
+        override-build: |
+            add-apt-repository ppa:mc3man/mpv-tests -y
+            add-apt-repository ppa:jonathonf/ffmpeg-4 -y
+            apt update
+            apt upgrade -yy
         prime: [-*]
 
     desktop-qt5:
