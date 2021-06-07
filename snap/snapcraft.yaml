@@ -60,7 +60,6 @@ parts:
             - libass9
             - libbluray2
             - libdvdread8
-            - libjack-0.125
             - librubberband2
             - libsndio7.1
             - libva-drm2
@@ -72,7 +71,6 @@ parts:
             - libass9
             - libbluray2
             - libdvdread8
-            - libjack-0.125
             - librubberband2
             - libsndio7.1
             - libva-drm2
