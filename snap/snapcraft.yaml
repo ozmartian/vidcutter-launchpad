@@ -67,4 +67,3 @@ parts:
             - simplejson
         install: |
             sed -i 's|Icon=.*|Icon=${SNAP}/share/icons/hicolor/512x512/apps/com.ozmartians.VidCutter.png|g' ${SNAPCRAFT_PART_INSTALL}/share/applications/com.ozmartians.VidCutter.desktop
-            rm ${SNAPCRAFT_PART_INSTALL}/lib/python3.6/site-packages/PyQt5/Qt/lib/libQt5WebEngineCore.so.5
