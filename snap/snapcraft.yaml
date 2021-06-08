@@ -17,7 +17,7 @@ confinement: strict
 
 apps:
     vidcutter:
-        command: bin/desktop-launch $SNAP/bin/vidcutter
+        command: bin/vidcutter
         plugs: [unity7, x11, wayland, desktop, home, pulseaudio, gsettings, opengl, mount-observe, network, network-bind, network-manager]
         desktop: share/applications/com.ozmartians.VidCutter.desktop
 
@@ -49,6 +49,7 @@ parts:
 
     vidcutter:
         plugin: python
+        source: .
         after: [prepare, desktop-qt5]
         build-packages:
             - python3-dev
