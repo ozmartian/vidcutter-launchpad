@@ -48,7 +48,6 @@ parts:
 
     vidcutter:
         plugin: python
-        python-version: python3
         after: [prepare, desktop-qt5]
         build-packages:
             - python3-dev
