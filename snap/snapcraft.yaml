@@ -45,6 +45,7 @@ parts:
             - mesa-vdpau-drivers
             - libglu1-mesa
             - libdb5.3
+            - libgtk2.0-0
 
     vidcutter:
         plugin: python
