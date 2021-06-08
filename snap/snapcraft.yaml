@@ -29,6 +29,7 @@ parts:
         prime: [-*]
 
     desktop-qt5:
+        plugin: nil
         after: [prepare]
         stage-packages:
             - libxkbcommon0
