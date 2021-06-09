@@ -59,6 +59,8 @@ parts:
             - python3-opengl
             - python3-simplejson
             - python3-pyqt5
+            - python3-pyqt5.qtmultimedia
+            - python3-pyqt5.qtopengl
             - python3-pyqt5.qtx11extras
             - libmpv1
             - ffmpeg
