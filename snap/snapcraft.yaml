@@ -52,6 +52,9 @@ parts:
             - shared-mime-info
             - libqt5gui5
             - libgdk-pixbuf2.0-0
+            - mesa-vdpau-drivers
+            - libglu1-mesa
+            - libdb5.3
             - libqt5svg5 # for loading icon themes which are svg
             - try: [appmenu-qt5] # not available on core18
             - locales-all
@@ -59,11 +62,6 @@ parts:
             - fcitx-frontend-qt5
             - libgtk2.0-0
             - libslang2
-            - libgdk-pixbuf2.0-0
-            - locales-all
-            - mesa-vdpau-drivers
-            - libglu1-mesa
-            - libdb5.3
 
     vidcutter:
         plugin: python
