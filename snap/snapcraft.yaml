@@ -69,7 +69,6 @@ parts:
             - mediainfo
         python-packages:
             # - pyqt5==5.14.1
-            - sip==4.19.8
-            - pyqt5==5.10.1
+            - pyqt5==5.11.2
             - pyopengl
             - simplejson
