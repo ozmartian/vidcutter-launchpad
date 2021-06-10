@@ -54,6 +54,8 @@ parts:
             - xdg-user-dirs
             - fcitx-frontend-qt5
             - libgtk2.0-0
+            - python3-pyqt5
+            - python3-pyqt5.qtx11extras
 
     vidcutter:
         plugin: python
@@ -67,7 +69,9 @@ parts:
             - libmpv1
             - ffmpeg
             - mediainfo
+            - python3-pyqt5
+            - python3-pyqt5.qtx11extras
         python-packages:
-            - pyqt5==5.14.2
+            - pyqt5==5.14.1
             - pyopengl
             - simplejson
