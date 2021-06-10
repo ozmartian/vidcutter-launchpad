@@ -15,6 +15,10 @@ icon: data/icons/hicolor/512x512/apps/com.ozmartians.VidCutter.png
 grade: stable
 confinement: strict
 
+package-repositories:
+    - type: apt
+      ppa: ozmartian/apps
+
 apps:
     vidcutter:
         command: bin/desktop-launch $SNAP/bin/vidcutter
@@ -71,3 +75,4 @@ parts:
             - libmpv1
             - ffmpeg
             - mediainfo
+            - vidcutter
