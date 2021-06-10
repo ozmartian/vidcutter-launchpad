@@ -18,7 +18,7 @@ confinement: strict
 apps:
     vidcutter:
         command: desktop-launch $SNAP/bin/vidcutter
-        plugs: [unity7, x11, wayland, desktop, home, pulseaudio, gsettings, opengl, mount-observe, network, network-bind, network-manager]
+        plugs: [unity7, x11, wayland, desktop, home, pulseaudio, gsettings, opengl, mount-observe, network, network-bind, network-manager, removable-media]
         desktop: share/applications/com.ozmartians.VidCutter.desktop
 
 parts:
@@ -59,6 +59,11 @@ parts:
             - fcitx-frontend-qt5
             - libgtk2.0-0
             - libslang2
+            - libgdk-pixbuf2.0-0
+            - locales-all
+            - mesa-vdpau-drivers
+            - libglu1-mesa
+            - libdb5.3
 
     vidcutter:
         plugin: python
@@ -80,4 +85,3 @@ parts:
             - ffmpeg
             - mediainfo
             - libslang2
-            - nvidia-340-dev
