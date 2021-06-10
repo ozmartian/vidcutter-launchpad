@@ -27,8 +27,9 @@ parts:
         build-packages:
             - software-properties-common
         override-build: |
-            add-apt-repository ppa:mc3man/bionic-media -y
+            add-apt-repository ppa:mc3man/bionic-prop -y
             apt update
+            apt upgrade -yy
         prime: [-*]
 
     desktop-qt5:
