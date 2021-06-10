@@ -15,10 +15,6 @@ icon: data/icons/hicolor/512x512/apps/com.ozmartians.VidCutter.png
 grade: stable
 confinement: strict
 
-package-repositories:
-    - type: apt
-      ppa: ozmartian/apps
-
 apps:
     vidcutter:
         command: bin/desktop-launch $SNAP/bin/vidcutter
@@ -58,6 +54,8 @@ parts:
             - xdg-user-dirs
             - fcitx-frontend-qt5
             - libgtk2.0-0
+            - python3-pyqt5
+            - python3-pyqt5.qtx11extras
 
     vidcutter:
         plugin: python
@@ -75,4 +73,5 @@ parts:
             - libmpv1
             - ffmpeg
             - mediainfo
-            - vidcutter
+        python-packages:
+            - pyqt5
