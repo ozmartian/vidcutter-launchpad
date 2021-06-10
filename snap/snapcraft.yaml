@@ -72,7 +72,6 @@ parts:
             - ffmpeg
             - mediainfo
         python-packages:
-            # - pyqt5==5.14.1
-            - pyqt5==5.11.2
+            - pyqt5
             - pyopengl
             - simplejson
