@@ -1,7 +1,7 @@
 name: vidcutter
 version: 6.0.5
 type: app
-base: core20
+base: core18
 architectures:
     - amd64
 summary: the simplest + fastest media cutter and joiner
@@ -17,8 +17,8 @@ confinement: strict
 
 apps:
     vidcutter:
-        command: bin/desktop-launch $SNAP/bin/vidcutter
-        plugs: [unity7, x11, wayland, desktop, home, audio-playback, gsettings, opengl, mount-observe, network, network-bind, network-manager]
+        command: desktop-launch $SNAP/bin/vidcutter
+        plugs: [unity7, x11, wayland, desktop, home, pulseaudio, gsettings, opengl, mount-observe, network, network-bind, network-manager]
         desktop: share/applications/com.ozmartians.VidCutter.desktop
 
 parts:
@@ -26,6 +26,9 @@ parts:
         plugin: nil
         build-packages:
             - software-properties-common
+        override-build: |
+            add-apt-repository ppa:mc3man/bionic-media -y
+            apt update
         prime: [-*]
 
     desktop-qt5:
