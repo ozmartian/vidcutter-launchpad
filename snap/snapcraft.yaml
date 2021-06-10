@@ -69,11 +69,9 @@ parts:
             - libmpv1
             - ffmpeg
             - mediainfo
-            - python3-opengl
-            - python3-simplejson
             - python3-pyqt5
             - python3-pyqt5.qtx11extras
-        # python-packages:
-        #     - pyqt5==5.14.1
-        #     - pyopengl
-        #     - simplejson
+        python-packages:
+            - pyqt5==5.14.1
+            - pyopengl
+            - simplejson
