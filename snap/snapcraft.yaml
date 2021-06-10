@@ -58,6 +58,7 @@ parts:
             - xdg-user-dirs
             - fcitx-frontend-qt5
             - libgtk2.0-0
+            - libslang2
 
     vidcutter:
         plugin: python
@@ -71,6 +72,7 @@ parts:
             - libmpv1
             - ffmpeg
             - mediainfo
+            - libslang2
         python-packages:
             - pyqt5
             - pyopengl
