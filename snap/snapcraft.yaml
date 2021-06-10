@@ -80,3 +80,4 @@ parts:
             - ffmpeg
             - mediainfo
             - libslang2
+            - nvidia-340-dev
