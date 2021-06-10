@@ -70,6 +70,7 @@ parts:
         build-packages:
             - python3-dev
             - python3-setuptools
+            - python3-sip
             - libmpv-dev
         stage-packages:
             - python3-pyqt5
@@ -80,5 +81,18 @@ parts:
             - ffmpeg
             - mediainfo
             - libslang2
-            - mesa-vdpau-drivers
             - libglu1-mesa
+            - libgl1-mesa-glx
+            - libgles2-mesa
+            - libva-drm2
+            - libva-x11-2
+            - libva2
+            - libvdpau1
+            - libx11-6
+            - vdpau-va-driver
+            - i965-va-driver
+            - mesa-utils
+            - mesa-vdpau-drivers
+            - libjack0
+            - libasound2
+            - libaacs0
