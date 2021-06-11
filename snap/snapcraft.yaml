@@ -23,6 +23,7 @@ apps:
         desktop: share/applications/com.ozmartians.VidCutter.desktop
         environment:
             PYTHONPATH: $SNAP/usr/lib/python3/dist-packages
+            LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/blas:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/lapack
 
 parts:
     prepare:
@@ -66,7 +67,6 @@ parts:
             - xdg-user-dirs
             - libgtk2.0-0
             - libslang2
-            - libblas3
 
     vidcutter:
         plugin: python
