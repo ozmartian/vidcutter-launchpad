@@ -67,15 +67,14 @@ parts:
         build-packages:
             - python3-dev
             - python3-setuptools
-            - python3-sip
             - libmpv-dev
         stage-packages:
             - libmpv1
             - ffmpeg
             - mediainfo
             - libslang2
-            - python3-sip
         python-packages:
+            - sip==5.0.0
             - pyqt5==5.10.1
             - pyopengl
             - simplejson
