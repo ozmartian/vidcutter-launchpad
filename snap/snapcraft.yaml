@@ -10,6 +10,7 @@ description: |
     hella fast MEDIA CUTTER + JOINER w/ frame-accurate
     SmartCut technology + Qt5, libmpv, FFmpeg and
     MediaInfo powering the backend.
+
 icon: data/icons/hicolor/512x512/apps/com.ozmartians.VidCutter.png
 
 grade: stable
@@ -63,9 +64,9 @@ parts:
             - try: [appmenu-qt5] # not available on core18
             - locales-all
             - xdg-user-dirs
-            - fcitx-frontend-qt5
             - libgtk2.0-0
             - libslang2
+            - libblas3
 
     vidcutter:
         plugin: python
@@ -84,3 +85,4 @@ parts:
             - ffmpeg
             - mediainfo
             - libslang2
+            - libblas3
