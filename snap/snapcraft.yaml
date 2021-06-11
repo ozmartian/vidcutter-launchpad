@@ -29,7 +29,8 @@ parts:
         build-packages:
             - software-properties-common
         override-build: |
-            add-apt-repository ppa:mc3man/bionic-prop -y
+            add-apt-repository ppa:savoury1/ffmpeg4 -y
+            add-apt-repository ppa:savoury1/mpv -y
             apt update
             apt upgrade -yy
         prime: [-*]
