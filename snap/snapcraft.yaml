@@ -20,8 +20,6 @@ apps:
         command: bin/desktop-launch $SNAP/bin/vidcutter
         plugs: [unity7, x11, wayland, desktop, desktop-legacy, home, audio-playback, pulseaudio, gsettings, opengl, mount-observe, network, network-bind, network-manager, removable-media]
         desktop: share/applications/com.ozmartians.VidCutter.desktop
-        slots:
-            - mpris
 
 parts:
     prepare:
@@ -71,13 +69,12 @@ parts:
             - python3-setuptools
             - libmpv-dev
         stage-packages:
-            - python3-pyqt5
-            - python3-pyqt5.qtx11extras
             - libmpv1
             - ffmpeg
             - mediainfo
             - libslang2
         python-packages:
-            - pyqt5
+            - sip==4.19.8
+            - pyqt5==5.10.1
             - pyopengl
             - simplejson
