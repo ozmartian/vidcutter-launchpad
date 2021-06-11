@@ -73,9 +73,11 @@ parts:
         stage-packages:
             - python3-pyqt5
             - python3-pyqt5.qtx11extras
-            - python3-opengl
-            - python3-simplejson
             - libmpv1
             - ffmpeg
             - mediainfo
             - libslang2
+        python-packages:
+            - pyqt5
+            - pyopengl
+            - simplejson
