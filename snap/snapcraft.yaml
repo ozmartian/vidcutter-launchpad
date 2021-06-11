@@ -79,3 +79,4 @@ parts:
             - ffmpeg
             - mediainfo
             - libslang2
+            - libwbclient0
