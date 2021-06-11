@@ -1,7 +1,7 @@
 name: vidcutter
 version: 6.0.5
 type: app
-base: core18
+base: core20
 architectures:
     - amd64
 summary: the simplest + fastest media cutter and joiner
@@ -17,7 +17,7 @@ confinement: strict
 
 apps:
     vidcutter:
-        command: desktop-launch $SNAP/bin/vidcutter
+        command: bin/desktop-launch $SNAP/bin/vidcutter
         plugs: [unity7, x11, wayland, desktop, desktop-legacy, home, audio-playback, pulseaudio, gsettings, opengl, mount-observe, network, network-bind, network-manager, removable-media]
         desktop: share/applications/com.ozmartians.VidCutter.desktop
         environment:
@@ -80,7 +80,6 @@ parts:
             - python3-pyqt5.qtx11extras
             - python3-opengl
             - python3-simplejson
-            - libarchive13
             - libmpv1
             - ffmpeg
             - mediainfo
