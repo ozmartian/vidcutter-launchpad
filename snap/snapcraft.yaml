@@ -80,6 +80,7 @@ parts:
             - python3-pyqt5.qtx11extras
             - python3-opengl
             - python3-simplejson
+            - libarchive13
             - libmpv1
             - ffmpeg
             - mediainfo
