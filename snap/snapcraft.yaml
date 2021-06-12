@@ -24,6 +24,7 @@ apps:
         environment:
             PYTHONPATH: $SNAP/usr/lib/python3/dist-packages
             LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/blas:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/lapack:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/samba:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/vdpau
+            QT_QPA_PLATFORMTHEME: gtk3
 
 parts:
     prepare:
@@ -87,4 +88,3 @@ parts:
             - mediainfo
             - libslang2
             - libblas3
-            - qt5-style-plugins
