@@ -56,6 +56,7 @@ parts:
             - gnome-themes-standard
             - shared-mime-info
             - libqt5gui5
+            - qt5-style-plugins
             - libgdk-pixbuf2.0-0
             - mesa-vdpau-drivers
             - libvdpau-va-gl1
@@ -86,3 +87,4 @@ parts:
             - mediainfo
             - libslang2
             - libblas3
+            - qt5-style-plugins
