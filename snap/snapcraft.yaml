@@ -50,11 +50,11 @@ parts:
         plugin: nil
         build-packages:
             - software-properties-common
-        override-build: |
-            add-apt-repository ppa:savoury1/ffmpeg4 -y
-            add-apt-repository ppa:savoury1/mpv -y
-            apt update
-            apt upgrade -yy
+        # override-build: |
+        #     add-apt-repository ppa:savoury1/ffmpeg4 -y
+        #     add-apt-repository ppa:savoury1/mpv -y
+        #     apt update
+        #     apt upgrade -yy
         prime: [-*]
 
     desktop-qt5:
