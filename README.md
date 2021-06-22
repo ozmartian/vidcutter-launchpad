@@ -1,9 +1,8 @@
 ![VidCutter](http://vidcutter.ozmartians.com/vidcutter-banner.png)
 
 [![AUR-GIT](https://img.shields.io/aur/version/vidcutter-git.svg)](https://aur.archlinux.org/packages/vidcutter-git)
-[![Build Status](https://travis-ci.org/ozmartian/vidcutter-appimage.svg)](https://github.com/ozmartian/vidcutter-appimage/releases/latest) 
-[![Build Status](https://travis-ci.org/ozmartian/vidcutter-osx.svg?branch=master)](https://github.com/ozmartian/vidcutter-osx/releases/latest)
 [![Build Status](https://ci.appveyor.com/api/projects/status/jgasythb2vqsxy7v?svg=true)](https://ci.appveyor.com/project/ozmartian/vidcutter/build/artifacts)
+[![Build Status](https://ci.appveyor.com/api/projects/status/sl8iyqp0232sehuf?svg=true)](https://ci.appveyor.com/project/ozmartian/vidcutter-osx/build/artifacts)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/425a00c7c6af446ba87c6152567d9f7e)](https://www.codacy.com/app/ozmartian/vidcutter)
 
 [![Screenshot 1](https://cdn.rawgit.com/ozmartian/vidcutter/gh-pages/images/vidcutter-01-thumb.png)](https://cdn.rawgit.com/ozmartian/vidcutter/gh-pages/images/vidcutter-01.png) 
@@ -11,15 +10,9 @@
 [![Screenshot 3](https://cdn.rawgit.com/ozmartian/vidcutter/gh-pages/images/vidcutter-03-thumb.png)](https://cdn.rawgit.com/ozmartian/vidcutter/gh-pages/images/vidcutter-03.png) 
 [![Screenshot 4](https://cdn.rawgit.com/ozmartian/vidcutter/gh-pages/images/vidcutter-04-thumb.png)](https://cdn.rawgit.com/ozmartian/vidcutter/gh-pages/images/vidcutter-04.png)
 
-### VidCutter 6 released on Flathub!
+### flatpak (Linux)
 
-VidCutter is now available as a flatpak at [Flathub](https://www.flathub.org) and is the most reliable option for Linux. All dependencies come bundled with it, including the very latest stable releases of mpv, FFmpeg, MediaInfo and associated codec libraries. Most linux distribution sofware centres like Plasma Discover and GNOME/Ubuntu Software are able to be expanded to also support searching and installing flatpaks from Flathub too. Unlike other packaged versions of VidCutter, the flatpak is purpose-built from the ground up with all dependencies built from source and containing only what the app requires resulting in a noticeably smaller total package file size.
-
-The flatpak is also an exclusive early release of upcoming version 6 which should be released across all platforms and usual channels towards the end of May so checkout the flatpak if you want an earlier peak.
-
-Click the icon below for VidCutter's page @ Flathub:
-
-[![VidCutter @ Flathub](https://flatpak.org/img/favicon57.png)](https://flathub.org/apps/details/com.ozmartians.VidCutter)
+<a href='https://flathub.org/apps/details/com.ozmartians.VidCutter'><img width='240' alt='Install via Flathub' src='https://flathub.org/assets/badges/flathub-badge-en.png'/></a>
 
 or via the terminal:
 
@@ -31,83 +24,33 @@ $ flatpak install flathub com.ozmartians.VidCutter
 $ flatpak run com.ozmartians.VidCutter
 ```
 
-### VidCutter snap Now Available!
+### snap (Linux)
 
-The latest version of VidCutter can now be installed as a snap package via the Ubuntu Snapcraft store at https://snapcraft.io/vidcutter or install it via the terminal as follows:
+<a href='https://snapcraft.io/vidcutter'><img alt='Install via Snap store' src='https://snapcraft.io/static/images/badges/en/snap-store-black.svg'/></a>
+
+or via the terminal:
 
 ```
-$ snap install vidcutter
+$ sudo snap install vidcutter
 ```
-
-### Latest DEV Builds Available
-
-Automated deployments from VidCutter CI servers have been setup together with new repos to host the latest builds produced. If you want to check out the very latest DEV builds of VidCutter then follow the links below. Do keep in mind that these are considered unstable so there is a small risk of things not working but care is taken to ensure only complete and working code is pushed to Git, but sometimes mistakes can happen.
-
-&nbsp; | VidCutter DEV Builds |
---- | --- |
-**Linux** | https://github.com/ozmartian/vidcutter-appimage/releases/latest |
-**Windows** | https://ci.appveyor.com/project/ozmartian/vidcutter/build/artifacts |
-**macOS** | https://github.com/ozmartian/vidcutter-osx/releases/latest |
 
 ***
 
-### Open Build Service
-
-Prebuilt Linux packages available, click on your distro below.
-
-|[![](https://vidcutter.ozmartians.com/logos/arch.png "Arch Linux")](https://software.opensuse.org/download/package?project=home:ozmartian&package=vidcutter)|  [![](https://vidcutter.ozmartians.com/logos/debian.png)](https://software.opensuse.org/download/package?project=home:ozmartian&package=vidcutter "Debian")|[![](http://vidcutter.ozmartians.com/logos/fedora.png)](https://copr.fedorainfracloud.org/coprs/suspiria/VidCutter "Fedora")|[![](http://vidcutter.ozmartians.com/logos/mageia.png)](https://software.opensuse.org/download/package?project=home:ozmartian&package=vidcutter "Mageia")|[![](http://vidcutter.ozmartians.com/logos/opensuse.png)](https://software.opensuse.org/download/package?project=home:ozmartian&package=vidcutter "openSUSE")|[![](http://vidcutter.ozmartians.com/logos/ubuntu.png)](https://software.opensuse.org/download/package?project=home:ozmartian&package=vidcutter "Ubuntu")
-|:---:|:---:|:---:|:---:|:---:|:---:|
-|Arch Linux|Debian|Fedora|Mageia|openSUSE|Ubuntu|
-
-***
-
-### Windows + macOS Users
-
-Native installers for Windows and macOS are available on the releases page with every new version, or just click the button below. 
-
-[![Latest Releases](http://tvlinker.ozmartians.com/images/button-latest-release.png)](https://github.com/ozmartian/vidcutter/releases/latest)
-
-#### Homebrew cask
-
-For macOS users of Homebrew, VidCutter can be easily installed as a "cask". With Homebrew already installed, just run the following terminal command:
-
-```
-$ brew install vidcutter
-```
-
-#### Chocolatey package
-
-VidCutter has finally been approved + published in the [Chocolatey](https://chocolatey.org) public repository (its a package manager like in Linux but
-for Windows).
-
-  To install VidCutter, run the following command from the command line or from PowerShell:
-  ```
-  C:\> choco install vidcutter
-  ```
-  To upgrade VidCutter, run the following command from the command line or from PowerShell:
-  ```
-  C:\> choco upgrade vidcutter
-  ```
-
-***
-
-### Linux Users
-
-#### Arch Linux
+### Arch Linux  (incl. Manjaro/etc.)
 
 Users can install directly from Arch's community repo since VidCutter has been added to Arch's official repos. There is also an AUR development version available.
    
     LATEST STABLE RELEASE:
 
-        pacman -S vidcutter
+        $ sudo pacman -S vidcutter
 
-Using an AUR helper like pacaur (replace pacaur with any other AUR helper):
+Using an AUR helper like yay (replace yay with any other AUR helper):
 
     LATEST DEVELOPMENT RELEASE:
     
-        pacaur -S vidcutter-git
+        $ yay -S vidcutter-git
 
-#### Ubuntu/Mint/Debian/KDE Neon and other Ubuntu flavors + derivatives 
+### Ubuntu (incl. Mint/Debian/KDE Neon/etc.)
 
 Users can install the latest release via:
 
@@ -115,72 +58,78 @@ Users can install the latest release via:
 
 The following set of commands will get you up and running:
 
-    sudo add-apt-repository ppa:ozmartian/apps
-    sudo apt update
-    sudo apt install vidcutter
+    $ sudo add-apt-repository ppa:ozmartian/apps
+    $ sudo apt update
+    $ sudo apt install vidcutter
 
-#### Fedora
+### openSUSE
 
-Due to Fedora's restrictive policies on media licensing you'll need to install a VidCutter package from a third-party repository to have all common media formats supported. At the time of writing RPMFusion and UnitedRPMs both contain VidCutter RPMs as well as all the required dependencies so you can simply install the VidCutter RPM package from these sources without needing to do anything else for an up to date version of the app with all common libraries, codecs and formats supported right away.
+VidCutter is available from openSUSE's official repos. Community built packages can be found @ https://software.opensuse.org/package/vidcutter.
 
-I also maintain a custom COPR repository at:
-
-    suspiria/VidCutter
-    
-I keep this updated myself so it will alwats carry the very latest release version but you will still need to enable one of the third-party repos for the multimedia dependencies. RPMFusion and UnitedRPMs only take a couple of days to update their repos when new versions are released so only bother with COPR if you're "must have the very latest version" type of addict.
-
-Commands for a Fedora install using the COPR repo are:
-
-    sudo dnf copr enable suspiria/VidCutter
-    sudo dnf install vidcutter
-    
-Check https://copr.fedorainfracloud.org/coprs/suspiria/VidCutter for more detailed instructions on enabling third-party repos for your multimedia dependencies.
-
-#### openSUSE
-
-https://software.opensuse.org/package/vidcutter
-
-VidCutter is available from openSUSE Leap 15.0 + Tumbleweed official distributions repos. Community built packages for other openSUSE releases/versions can be found @ https://software.opensuse.org/package/vidcutter. 
-
-VidCutter is also available from the popular Packman third-party repository. Instructions to enable it can be found here:
-
-   https://en.opensuse.org/Additional_package_repositories#Packman
-
-### AppImage
-
-An AppImage portable Linux binary is also available via the releases page for Linux users. AppImages are tested and confirmed to work on most Linux distributions. My personal testing includes Ubuntu (Trusty through to Artful), and current stable releases of  Mint, KDE Neon, Arch Linux, Manjaro, Antergos, Fedora, openSUSE, Debian, and Mageia.
-
-### snap
-
-Available on the Ubuntu Snapcraft store at https://snapcraft.io/vidcutter or install it via the terminal as follows:
-
-```
-$ snap install vidcutter
-```
-
-### FlatPak
-
-A FlatPak will soon be available via FlatHub for all you GNOME users. In the meantime, the AppImage or snap package should work as an alternative. 
+VidCutter is also available from the popular Packman repository. Instructions to enable it can be found @ https://en.opensuse.org/Additional_package_repositories#Packman.
 
 ***
 
-### PyPi
+### Microsoft Windows
 
-If you're familiar with Python and PyPi then you can always try that option too but avoid installing PyQt5 from through pip and instead run with your distributions own PyQt5 offering. PyQt5 is known as some of the following names under various distros: python-pyqt5, python3-pyqt5, python3-qt5 etc. Using your distro's version ensures a more seamless look & feel with the app integrating with your distro's look & feel + widget sets. Installing all via PyPi will still work, but won't look as nice..
+Download the latest Windows installer by clicking the button below.
 
-If installing via PyPi, be aware to also ensure you have the following tools also installed via your package manager or any other means it doesn't matter so long as they are installed:
+[![Latest Releases](http://tvlinker.ozmartians.com/images/button-latest-release.png)](https://github.com/ozmartian/vidcutter/releases/latest)
 
-    - libmpv (Arch: mpv, Ubuntu: libmpv1, Fedora: mpv-libs via RPMFusion, openSUSE: libmpv1)
-    - FFmpeg (ffmpeg in all places, if on older Linux then you may have libav-tools instead which will also work)
-    - mediainfo (mediainfo in all/most places. mainly needs to be the CLI version)
+#### Chocolatey package
 
-Fedora and RedHat users need to enable the RPMFusion repository in order to access mpv packages and just about anything multimedia-wise. Chances are you know what I'm talking about here but if not here are some simple steps to get VidCutter working in Fedora 25, the same should apply for any other RPM based distro... until I get off my lazy butt and try to learn RPM packaging (oh how horrible it looks though).... if anyone wants to help in this area by all means do!
+VidCutter is available from [Chocolatey](https://chocolatey.org) (its a package manager like in Linux but
+for Windows).
+
+  To install VidCutter, run the following command from the command line or PowerShell:
+  ```
+  C:\> choco install vidcutter
+  ```
+  To upgrade VidCutter, run the following command from the command line or PowerShell:
+  ```
+  C:\> choco upgrade vidcutter
+  ```
+
+***
+
+### macOS
+
+**Only macOS Catalina and below is currently supported. Big Sur is unstable until further notice.**
+
+Download the latest macOS installer by clicking the button below.
+
+[![Latest Releases](http://tvlinker.ozmartians.com/images/button-latest-release.png)](https://github.com/ozmartian/vidcutter/releases/latest)
+
+#### Homebrew package
+
+VidCutter is available from [Homebrew](https://brew.sh) as a cask.
+
+  To install VidCutter, run the following command in a terminal:
+  ```
+  $ brew install --cask vidcutter
+  ```
+
+***
+
+### Running from Python source
+
+In order to run from source code you need to first build a Python extension and then run the app as follows, from within the source code folder:
+
+```
+$ python3 setup.py build_ext -i
+$ python3 -m vidcutter
+```
+
+Working installations of **libmpv** and **ffmpeg** must be pre-installed for your specific OS. For Linux, package names are usually named **libmpv1** or **mpv** and **ffmpeg**.
+
+You will need Python packages **pyopengl** and **simplejson** pre-installed, via **pip install pyopengl simplejson** or distro packages, and a working PyQt5 + Qt5 libraries installation. Windows users can simply **pip install PyQt5** to be up and running, Linux users should install a relevant PyQt5 package from their Linux distribution's package manager. Linux package names for PyQt5 are usually named **python-pyqt5** or **python3-pyqt5** and will take care of the Qt5 side of things too.
 
 ***
 
 ## Command-line for debugging (Linux/macOS only)
-  ```
-  $ vidcutter --help
+
+```
+$ vidcutter --help
 
 Usage: vidcutter [options] [video] [project]
 
@@ -203,4 +152,4 @@ Options:
 Arguments:
   video          Preload video file
   project        Open VidCutter project file (.vcp)
-  ```
+```
