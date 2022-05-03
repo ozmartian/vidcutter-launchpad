@@ -27,13 +27,32 @@ import logging
 import os
 import sys
 
-from OpenGL import GL
-
 if sys.platform == 'win32':
+    from OpenGL import GL
     from PyQt5.QtOpenGL import QGLContext
 elif sys.platform == 'darwin':
-    from OpenGL.GLUT import glutGetProcAddress
+    try:
+        from OpenGL import GL
+        try:
+            from OpenGL.GLUT import glutGetProcAddress
+        except ImportError:
+            from ctypes import util
+            orig_util_find_library = util.find_library
+            def new_util_find_library( name ):
+                res = orig_util_find_library( name )
+                if res: return res
+                return '/System/Library/Frameworks/'+name+'.framework/'+name
+            util.find_library = new_util_find_library
+    except ImportError:
+        from ctypes import util
+        orig_util_find_library = util.find_library
+        def new_util_find_library( name ):
+            res = orig_util_find_library( name )
+            if res: return res
+            return '/System/Library/Frameworks/'+name+'.framework/'+name
+        util.find_library = new_util_find_library
 else:
+    from OpenGL import GL
     from OpenGL.platform import PLATFORM
     from ctypes import c_char_p, c_void_p
 
@@ -228,7 +247,7 @@ class mpvWidget(QOpenGLWidget):
 
     def version(self) -> str:
         ver = self.mpv.api_version
-        return '{0}.{1}'.format(ver[0], ver[1])
+        return '{0}.{1}'.format(ver[1], ver[0])
 
     def option(self, option: str, val):
         if isinstance(val, bool):

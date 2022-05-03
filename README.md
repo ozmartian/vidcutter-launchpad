@@ -3,7 +3,7 @@
 [![AUR-GIT](https://img.shields.io/aur/version/vidcutter-git.svg)](https://aur.archlinux.org/packages/vidcutter-git)
 [![Build Status](https://ci.appveyor.com/api/projects/status/jgasythb2vqsxy7v?svg=true)](https://ci.appveyor.com/project/ozmartian/vidcutter/build/artifacts)
 [![Build Status](https://ci.appveyor.com/api/projects/status/sl8iyqp0232sehuf?svg=true)](https://ci.appveyor.com/project/ozmartian/vidcutter-osx/build/artifacts)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/425a00c7c6af446ba87c6152567d9f7e)](https://www.codacy.com/app/ozmartian/vidcutter)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/21fd4f414d5545369e74dd78d3da67cc)](https://www.codacy.com/gh/ozmartian/vidcutter/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ozmartian/vidcutter&amp;utm_campaign=Badge_Grade)
 
 [![Screenshot 1](https://cdn.rawgit.com/ozmartian/vidcutter/gh-pages/images/vidcutter-01-thumb.png)](https://cdn.rawgit.com/ozmartian/vidcutter/gh-pages/images/vidcutter-01.png) 
 [![Screenshot 2](https://cdn.rawgit.com/ozmartian/vidcutter/gh-pages/images/vidcutter-02-thumb.png)](https://cdn.rawgit.com/ozmartian/vidcutter/gh-pages/images/vidcutter-02.png) 
@@ -34,11 +34,21 @@ or via the terminal:
 $ sudo snap install vidcutter
 ```
 
+### AppImage (Linux)
+
+[![AppImage](https://appimage.github.io/img/logo3.svg)](https://github.com/ozmartian/vidcutter/releases/download/6.0.5.1/VidCutter-6.0.5.1-x86_64.AppImage) 
+
+Download at https://github.com/ozmartian/vidcutter/releases/download/6.0.5.1/VidCutter-6.0.5.1-x86_64.AppImage and execute. You may need to set execute permissions if you encounter problems getting it to run:
+
+```
+$ chmod +x VidCutter-6.0.5.1-x86_64.AppImage
+```
+
 ***
 
 ### Arch Linux  (incl. Manjaro/etc.)
 
-Users can install directly from Arch's community repo since VidCutter has been added to Arch's official repos. There is also an AUR development version available.
+Users can install the stable version directly from the Arch Linux community repo packages or via AUR for the development version.
    
     LATEST STABLE RELEASE:
 
@@ -64,9 +74,19 @@ The following set of commands will get you up and running:
 
 ### openSUSE
 
-VidCutter is available from openSUSE's official repos. Community built packages can be found @ https://software.opensuse.org/package/vidcutter.
+VidCutter is available from openSUSE's official repos for Tumbleweed, Leap versions will be supported soon. Community built packages can be found @ https://software.opensuse.org/package/vidcutter.
 
 VidCutter is also available from the popular Packman repository. Instructions to enable it can be found @ https://en.opensuse.org/Additional_package_repositories#Packman.
+
+### Fedora
+
+Fedora 34 & Rawhide builds via copr @ https://copr.fedorainfracloud.org/coprs/suspiria/VidCutter
+
+```
+$ dnf copr enable suspiria/VidCutter
+```
+
+Also available at United RPMs at https://unitedrpms.github.io and https://github.com/UnitedRPMs/unitedrpms
 
 ***
 
@@ -120,7 +140,7 @@ $ python3 setup.py build_ext -i
 $ python3 -m vidcutter
 ```
 
-Working installations of **libmpv** and **ffmpeg** must be pre-installed for your specific OS. For Linux, package names are usually named **libmpv1** or **mpv** and **ffmpeg**.
+Working installations of **libmpv** and **ffmpeg** must be pre-installed for your specific OS. For Linux, package names are usually named **libmpv1** or **mpv** and **ffmpeg**. For the media information option to work you'll also need a working install of **mediainfo**.
 
 You will need Python packages **pyopengl** and **simplejson** pre-installed, via **pip install pyopengl simplejson** or distro packages, and a working PyQt5 + Qt5 libraries installation. Windows users can simply **pip install PyQt5** to be up and running, Linux users should install a relevant PyQt5 package from their Linux distribution's package manager. Linux package names for PyQt5 are usually named **python-pyqt5** or **python3-pyqt5** and will take care of the Qt5 side of things too.
 
