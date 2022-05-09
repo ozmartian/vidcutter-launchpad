@@ -33,7 +33,7 @@ __author__ = "Andre D"
 #_REQUIRED_CAPI_MAJOR = 2
 #_MIN_CAPI_MINOR = 0
 _REQUIRED_CAPI_MAJOR = 1
-_MIN_CAPI_MINOR = 109
+_MIN_CAPI_MINOR = 107
 
 cdef unsigned long _CAPI_VERSION
 with nogil:
