@@ -2524,7 +2524,7 @@ static PyObject *__pyx_int_0;
 static PyObject *__pyx_int_1;
 static PyObject *__pyx_int_3;
 static PyObject *__pyx_int_32;
-static PyObject *__pyx_int_109;
+static PyObject *__pyx_int_107;
 static PyObject *__pyx_int_5713169;
 static PyObject *__pyx_int_90958262;
 static PyObject *__pyx_int_142036910;
@@ -24842,7 +24842,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitGlobals(void) {
   __pyx_int_1 = PyInt_FromLong(1); if (unlikely(!__pyx_int_1)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_int_3 = PyInt_FromLong(3); if (unlikely(!__pyx_int_3)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_int_32 = PyInt_FromLong(32); if (unlikely(!__pyx_int_32)) __PYX_ERR(0, 1, __pyx_L1_error)
-  __pyx_int_109 = PyInt_FromLong(109); if (unlikely(!__pyx_int_109)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __pyx_int_107 = PyInt_FromLong(107); if (unlikely(!__pyx_int_107)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_int_5713169 = PyInt_FromLong(5713169L); if (unlikely(!__pyx_int_5713169)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_int_90958262 = PyInt_FromLong(90958262L); if (unlikely(!__pyx_int_90958262)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_int_142036910 = PyInt_FromLong(142036910L); if (unlikely(!__pyx_int_142036910)) __PYX_ERR(0, 1, __pyx_L1_error)
@@ -25323,7 +25323,7 @@ if (!__Pyx_RefNanny) {
  * #_REQUIRED_CAPI_MAJOR = 2
  * #_MIN_CAPI_MINOR = 0
  * _REQUIRED_CAPI_MAJOR = 1             # <<<<<<<<<<<<<<
- * _MIN_CAPI_MINOR = 109
+ * _MIN_CAPI_MINOR = 107
  * 
  */
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_REQUIRED_CAPI_MAJOR, __pyx_int_1) < 0) __PYX_ERR(0, 35, __pyx_L1_error)
@@ -25331,11 +25331,11 @@ if (!__Pyx_RefNanny) {
   /* "vidcutter/libs/pympv/mpv.pyx":36
  * #_MIN_CAPI_MINOR = 0
  * _REQUIRED_CAPI_MAJOR = 1
- * _MIN_CAPI_MINOR = 109             # <<<<<<<<<<<<<<
+ * _MIN_CAPI_MINOR = 107             # <<<<<<<<<<<<<<
  * 
  * cdef unsigned long _CAPI_VERSION
  */
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_MIN_CAPI_MINOR, __pyx_int_109) < 0) __PYX_ERR(0, 36, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_MIN_CAPI_MINOR, __pyx_int_107) < 0) __PYX_ERR(0, 36, __pyx_L1_error)
 
   /* "vidcutter/libs/pympv/mpv.pyx":39
  * 
