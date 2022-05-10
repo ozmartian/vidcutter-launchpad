@@ -90,7 +90,6 @@ parts:
             - libslang2
             - qt5-gtk-platformtheme
             - qtwayland5
-            - libgtk-3-common
 
     vidcutter:
         plugin: python
@@ -112,4 +111,3 @@ parts:
             - libblas3
             - qt5-gtk-platformtheme
             - qtwayland5
-            - libgtk-3-common
